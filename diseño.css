@@ -1,0 +1,639 @@
+/* 
+Principal (Madera/Cuero): #4A3026
+Secundario (Azul Frío): #4B708A
+Acento (Verde Oscuro): #556B2F
+Fondo Base (Beige Claro): #FAF4E7
+Fondo Contenido (Beige Oscuro): #E8D7B8
+*/
+
+/* Estilos generales */
+body {
+  font-family: 'Roboto Slab', serif; 
+  margin: 0;
+  padding: 0;
+  background-color: #FAF4E7; /* Fondo Beige Claro */
+  color: #4A3026; /* Café profundo como color principal de texto */
+  line-height: 1.6;
+}
+
+/* Contenedor para centrar el contenido */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ======================================
+ENCABEZADO Y LOGIN SUPERIOR DERECHA
+====================================== */
+
+.header {
+  display: flex;
+  align-items: center;
+  background-color: #4A3026; /* Principal (Madera/Cuero) */
+  color: #FAF4E7;
+  padding: 15px 40px; 
+  position: relative; 
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  width: auto; 
+}
+
+.logo {
+  width: 80px;
+  margin-right: 20px;
+}
+
+.header-content h1 {
+  margin: 0;
+  font-size: 2.8rem;
+  font-family: 'Playfair Display', serif; 
+}
+
+.slogan {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #4B708A; 
+}
+
+/* Botón de Login en el Encabezado */
+.btn-login {
+    position: absolute;
+    right: 20px; 
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #4B708A;
+    color: #FAF4E7;
+    padding: 8px 15px; 
+    font-size: 0.9rem;
+    font-weight: bold;
+    border: none;
+    text-transform: none;
+}
+
+.btn-login:hover {
+    background-color: #556B2F;
+}
+
+/* Alerta de Login Flotante */
+.login-alert {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #4B708A; 
+    color: white;
+    padding: 15px 25px;
+    border-radius: 5px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    z-index: 1000; 
+    transition: opacity 0.5s, transform 0.5s;
+    font-size: 1rem;
+}
+
+.login-alert a {
+    color: #FAF4E7;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.hidden-alert {
+    opacity: 0;
+    transform: translateX(100%);
+    pointer-events: none;
+}
+
+/* Menú de navegación */
+.navbar {
+  background-color: #E8D7B8; 
+  padding: 15px 0;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.navbar a {
+  color: #4A3026; 
+  margin: 0 20px;
+  text-decoration: none;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  transition: color 0.3s;
+}
+
+.navbar a:hover {
+  color: #4B708A; 
+  text-decoration: none;
+}
+
+/* Hero / inicio */
+.hero {
+  text-align: center;
+  /* Nueva imagen de fondo relacionada con muebles */
+  background: url('https://images.unsplash.com/photo-1555041469-a586c61ea9bc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNTY3MHwwfDF8c2VhcmNofDh8fGZ1cm5pdHVyZXxlbnwwfHx8fDE2NzUwNzI5NDk&ixlib=rb-4.0.3&q=80&w=1080') no-repeat center center/cover;
+  background-attachment: fixed; 
+  padding: 120px 20px; 
+  color: white; 
+  text-shadow: 0 0 10px rgba(0,0,0,0.8);
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.hero h2 {
+  font-size: 3.5rem;
+  color: white; 
+  font-family: 'Playfair Display', serif;
+  margin-bottom: 15px;
+}
+
+.hero p {
+  font-size: 1.4rem;
+  margin-bottom: 30px;
+}
+
+/* Estilo de Botón General (.btn) */
+.btn {
+  background-color: #4B708A;
+  color: #FAF4E7;
+  border: 2px solid #4B708A; 
+  padding: 14px 30px; 
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.3s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn:hover {
+  background-color: #556B2F; 
+  border-color: #556B2F;
+}
+
+/* Secciones */
+section {
+  padding: 60px 20px;
+}
+
+section h1 { 
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
+    text-align: center;
+    margin-bottom: 5px;
+    color: #4A3026;
+}
+
+section h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.section-desc {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #797979;
+  max-width: 800px; 
+  margin: 0 auto 40px auto;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+  gap: 30px;
+}
+
+/* ======================================
+CATÁLOGO Y FILTROS
+====================================== */
+
+/* Filtros */
+.filter-menu {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.filter-menu .btn {
+    padding: 10px 20px;
+    margin: 5px;
+    background-color: #E8D7B8; 
+    color: #4A3026;
+    border: 1px solid #4A3026;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.filter-menu .btn.active-filter,
+.filter-menu .btn:hover {
+    background-color: #4B708A; /* Azul Frío */
+    color: #FAF4E7;
+    border-color: #4B708A;
+}
+
+/* Catálogo (Tarjetas de Producto) */
+.catalogo .card { 
+  background: #E8D7B8; 
+  text-align: center;
+  border-radius: 8px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer; 
+}
+
+.catalogo .card:hover {
+    transform: translateY(-5px); 
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+}
+
+.catalogo .card img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  display: block;
+}
+
+.catalogo .card h3 {
+    font-family: 'Playfair Display', serif;
+    margin: 15px 0 5px 0;
+    font-size: 1.6rem;
+}
+
+.catalogo .card p.detalle-tecnico { 
+    color: #4A3026; 
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin: 5px 0;
+}
+
+.catalogo .card p.precio {
+    color: #4B708A; 
+    font-weight: bold;
+    font-size: 1.1rem; 
+    padding-bottom: 15px;
+    margin-top: 5px;
+}
+
+/* ======================================
+MODAL DE DETALLE DE PRODUCTO
+====================================== */
+
+.modal {
+    display: none; 
+    position: fixed;
+    z-index: 2000; 
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(74, 48, 38, 0.9); 
+    padding-top: 50px;
+}
+
+.modal.show {
+    display: block;
+}
+
+.modal-content {
+    background-color: #FAF4E7;
+    margin: 5% auto; 
+    padding: 20px;
+    border-radius: 10px;
+    width: 80%; 
+    max-width: 1000px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    position: relative;
+    animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-50px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.close-btn {
+    color: #4A3026;
+    float: right;
+    font-size: 35px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 25px;
+    padding: 10px;
+    transition: color 0.3s;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+    color: #4B708A;
+}
+
+.modal-body {
+    padding: 20px 0;
+}
+
+.modal-body h2 {
+    text-align: left;
+    font-size: 2.2rem;
+    color: #4B708A;
+    margin-top: 0;
+    border-bottom: 2px solid #E8D7B8;
+    padding-bottom: 10px;
+}
+
+.modal-body h3 {
+    text-align: left;
+    font-size: 1.5rem;
+    color: #4A3026;
+    margin-bottom: 15px;
+}
+
+.modal-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr; 
+    gap: 30px;
+    align-items: flex-start;
+}
+
+.modal-image-container img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.modal-specs {
+    padding: 10px;
+}
+
+.spec-item {
+    margin-bottom: 15px;
+}
+
+.spec-item label {
+    font-weight: 700;
+    color: #556B2F; 
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 5px;
+}
+
+.spec-item p {
+    margin: 0;
+    padding-left: 10px;
+    font-size: 1.1rem;
+    color: #4A3026;
+}
+
+.modal-specs hr {
+    border: 0;
+    border-top: 1px dashed #D1C4B8;
+    margin: 20px 0;
+}
+
+.modal-btn-pedido {
+    width: 100%;
+    text-align: center;
+    margin-top: 30px;
+    padding: 15px;
+}
+
+/* ======================================
+REFACCIÓN (Estructura de 3 columnas)
+====================================== */
+
+.refaccion-section {
+    background-color: #E8D7B8; 
+}
+
+.refaccion-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr; 
+    gap: 30px;
+    margin-top: 40px;
+    align-items: stretch;
+}
+
+.beneficio {
+    text-align: center;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #FAF4E7;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.05); 
+}
+
+.beneficio h3 {
+    color: #556B2F; 
+    font-size: 1.4rem;
+    font-family: 'Playfair Display', serif;
+}
+
+.refaccion-form-card {
+    background-color: #FAF4E7; 
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.refaccion-form-card h3 {
+    font-family: 'Playfair Display', serif;
+    color: #4A3026;
+    margin-top: 0;
+    font-size: 1.8rem;
+    border-bottom: 2px solid #556B2F; 
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.refaccion-form-card input, .refaccion-form-card textarea {
+    padding: 10px;
+    border: 1px solid #D1C4B8;
+    border-radius: 4px;
+    background-color: white;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.refaccion-form-card .btn {
+    margin-top: 25px;
+    padding: 12px;
+    background-color: #556B2F; 
+    border-color: #556B2F;
+}
+
+.refaccion-form-card .btn:hover {
+    background-color: #4A3026; 
+    border-color: #4A3026;
+}
+
+/* Galería, Testimonios, Pedidos y Auth Section (Se mantienen iguales) */
+.galeria {
+    /* ... */
+}
+
+.grid-galeria {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.grid-galeria img {
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  transition: transform 0.3s;
+}
+.grid-galeria img:hover {
+  transform: scale(1.02);
+}
+
+.testimonios {
+    background-color: #E8D7B8; 
+}
+.testimonios blockquote {
+    font-style: italic;
+    font-size: 1.2rem;
+    line-height: 1.8;
+    border-left: 5px solid #4B708A; 
+    padding-left: 20px;
+    margin: 20px 0;
+    background-color: #FAF4E7;
+    padding: 20px;
+    border-radius: 0 8px 8px 0;
+}
+.testimonios blockquote span {
+    display: block;
+    font-style: normal;
+    font-weight: bold;
+    margin-top: 10px;
+    color: #4A3026;
+}
+
+.pedidos {
+  background-color: #FAF4E7;
+}
+
+.grid-pedidos {
+    display: grid;
+    grid-template-columns: 1fr 2fr; 
+    gap: 40px;
+    max-width: 1200px;
+    margin: 40px auto;
+}
+
+.card-pedido {
+    background-color: #E8D7B8;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.auth-section {
+    background-color: #E8D7B8; 
+}
+
+/* Contacto y Footer (Se mantienen iguales) */
+.contacto {
+  text-align: center;
+  background-color: #E8D7B8;
+}
+
+.footer {
+  background-color: #4A3026; 
+  color: #4B708A; 
+  text-align: center;
+  padding: 20px;
+}
+
+/* ======================================
+RESPONSIVE DESIGN (Adaptación Móvil)
+====================================== */
+
+@media (max-width: 900px) {
+  /* Ajuste de Grid General */
+  .grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+  
+  /* Ajuste de Login para Móvil */
+  .btn-login {
+      position: static; 
+      transform: none;
+      margin-top: 10px;
+      align-self: flex-start;
+  }
+
+  .header-content {
+      width: 100%; 
+      flex-direction: column;
+      align-items: flex-start;
+  }
+  
+  /* Ajuste para la rejilla de Refacción */
+  .refaccion-grid {
+    grid-template-columns: 1fr; 
+    gap: 20px;
+  }
+  
+  /* Ajuste para la rejilla de Pedidos */
+  .grid-pedidos {
+    grid-template-columns: 1fr; 
+    gap: 20px;
+    margin: 20px auto;
+  }
+  
+  /* Responsive para el Modal */
+  .modal-content {
+      width: 90%;
+      margin: 10% auto;
+  }
+  .modal-grid {
+      grid-template-columns: 1fr; /* Columna única en móviles */
+  }
+  .modal-body h2 {
+      text-align: center;
+  }
+}
+
+@media (max-width: 600px) {
+    /* Ajuste de Tipografía y Espaciado */
+    .header-content h1 { font-size: 2rem; }
+    .slogan { font-size: 0.9rem; }
+    .hero h2 { font-size: 2.2rem; }
+    .hero p { font-size: 1.1rem; }
+    section h1, section h2 { font-size: 2rem; }
+    section { padding: 40px 10px; }
+
+    /* Navegación: apilar los enlaces */
+    .navbar .container {
+        display: flex;
+        flex-direction: column; 
+    }
+    .navbar a {
+        margin: 5px 0; 
+    }
+    
+    .hero {
+        padding: 60px 20px;
+    }
+
+    /* Grid: apilar las tarjetas en una sola columna */
+    .grid, .grid-galeria, .auth-section .grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .catalogo .card img {
+      height: 200px;
+    }
+}

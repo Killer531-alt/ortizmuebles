@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <link rel="icon" type="image/jpeg" href="Sofas/logo.jpeg">
+  <style>
+    .admin-tabs { margin: 2em 0 1em 0; display: flex; flex-wrap: wrap; gap: 0.5em; }
+    .admin-tab { margin-right: 0; background: #eee; color: #333; border: 1px solid #bbb; min-width: 120px; font-size: 1em; }
+    .admin-tab.active { background: #4a90e2; color: #fff; }
+    .admin-table-container { margin-top: 1em; overflow-x: auto; }
+    table.admin-table { width: 100%; border-collapse: collapse; margin-bottom: 2em; font-size: 0.97em; }
+    table.admin-table th, table.admin-table td { border: 1px solid #ccc; padding: 0.45em 0.4em; text-align: left; }
+    table.admin-table th { background: #f5f5f5; font-size: 1em; }
+    .admin-action-btn { background: #357ab8; color: #fff; border: none; border-radius: 4px; padding: 0.3em 1em; cursor: pointer; margin-right: 0.5em; font-size: 0.97em; }
+    .admin-action-btn.closed { background: #aaa; }
+    .admin-contact-btn {
+      margin-left: 0.3em;
+      font-size: 1.15em;
+      text-decoration: none;
+      vertical-align: middle;
+      transition: color 0.2s;
+      display: inline-block;
+    }
+    .admin-contact-btn:hover {
+      color: #4a90e2;
+    }
+    @media (max-width: 700px) {
+      .admin-table-container { font-size: 0.93em; }
+      table.admin-table th, table.admin-table td { font-size: 0.93em; }
+      .login-form-card { padding: 1em 0.5em; }
+    }
+    .btn-login { font-size:0.95em;padding:0.4em 1.1em;min-width:120px; }
+  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orlando Ortiz Muebles | Artesanía y Diseño a Medida</title>
+  <meta name="description" content="Orlando Ortiz Muebles: muebles artesanales, refacción y diseño a medida en Bogotá. Solicita cotización, personaliza telas y maderas.">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Roboto+Slab:wght@100..900&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="diseño.css"> 
+  <style>
+    form .form-group { margin-bottom: 1.2em; }
+    form fieldset { border: 1px solid #ccc; border-radius: 8px; margin-bottom: 1.5em; padding: 1em; }
+    form legend { font-weight: bold; color: #333; margin-bottom: 0.5em; }
+    form label { display: block; margin-bottom: 0.2em; font-weight: 500; }
+    form input, form select, form textarea { width: 100%; padding: 0.5em; margin-bottom: 0.2em; border-radius: 5px; border: 1px solid #bbb; font-size: 1em; }
+    form input:focus, form select:focus, form textarea:focus { outline: 2px solid #4a90e2; border-color: #4a90e2; }
+    form .error-message { color: #c00; font-size: 0.95em; margin-bottom: 0.5em; display: none; }
+    form input.invalid, form select.invalid, form textarea.invalid { border: 2px solid #c00; background: #fff0f0; }
+    form button.btn { margin-top: 1em; font-size: 1.1em; padding: 0.7em 2em; background: #4a90e2; color: #fff; border: none; border-radius: 6px; cursor: pointer; transition: background 0.2s; }
+    form button.btn:hover { background: #357ab8; }
+  </style>
+</head>
+<body>
+
+  <div id="login-alert" class="login-alert hidden-alert">
+    ¡Debes <strong>Iniciar Sesión</strong> antes de enviar tu solicitud! <a href="#auth">Haz clic aquí para ingresar.</a>
+  </div>
+
+  <header class="header">
+    <div class="container header-content">
+      <img src="Sofas/logo.jpeg" alt="Logo Orlando Ortiz Muebles" class="logo">
+      <div>
+        <h1>Orlando Ortiz Muebles</h1>
+        <p class="slogan">Tradición, calidad y diseño para tu hogar</p>
+      </div>
+  <a href="#auth" id="login-button" class="btn btn-login">Iniciar Sesión</a>
+    </div>
+  </header>
+
+  <nav class="navbar">
+    <div class="container">
+      <a href="#inicio">Inicio</a>
+      <a href="#catalogo">Catálogo</a>
+      <a href="#refaccion">Refacción</a>
+      <a href="#galeria">Galería</a>
+      <a href="#testimonios">Testimonios</a>
+      <a href="#pedidos">Pedidos</a>
+      <a href="#contacto">Contacto</a>
+    </div>
+  </nav>
+
+  <section id="inicio" class="hero">
+    <div class="hero-text">
+      <h2>Muebles Exclusivos | Hechos Desde Cero</h2>
+      <p>Diseñamos, creamos y restauramos piezas únicas. Tu mueble, tu estilo, nuestra artesanía.</p>
+      <a href="#catalogo" class="btn">Ver Catálogo</a>
+    </div>
+  </section>
+
+  <section id="catalogo" class="catalogo">
+    <div class="container">
+      <h1>CATÁLOGO</h1>
+      <h2>Muebles Exclusivos | Hechos Desde Cero</h2>
+  <p class="section-desc">En "Mostrar Todo" te presentamos los productos <strong>en tendencia</strong>. Haz click en la categoría para ver el catálogo completo (15-20 productos).</p>
+
+      <div id="category-filter-menu" class="filter-menu">
+        <button data-filter="all" class="btn active-filter">Mostrar Todo</button>
+        <button data-filter="sofases" class="btn">Sofáses</button>
+        <button data-filter="poltronas" class="btn">Poltronas</button>
+        <button data-filter="cabeceros" class="btn">Cabeceros</button>
+        <button data-filter="puffs" class="btn">Puffs</button>
+        <button data-filter="bases" class="btn">Bases de Cama</button>
+      </div>
+
+      <div id="product-grid" class="grid">
+        
+        <div class="card" data-category="sofases" data-tela="Lino Gris" data-madera="Cedro" data-precio="$2.000.000 (Precio base)" data-medidas="200 cm (Largo) x 90 cm (Ancho) x 85 cm (Profundidad)" data-imagen="Sofas/sofa-moderno-oslo.jpg">
+      <img src="Sofas/chester.JPG" alt="Sofá Chester - personalizado" loading="lazy">
+          <h3>Sofá Chester</h3>
+          <p class="detalle-tecnico">Madera: Cedro | Tela: Lino Gris</p>
+          <p class="precio">$2.000.000 (Precio base)</p>
+        </div>
+        
+        <div class="card" data-category="sofases" data-tela="Lino Gris Oscuro" data-madera="Roble" data-precio="$3.200.000 (Precio base)" data-medidas="250 cm (Largo) x 100 cm (Ancho) x 90 cm (Profundidad)" data-imagen="Sofas/sofa-modular-elite.jpg">
+          <img src="Sofas/IMG_20181221_172501.jpg" alt="Sofá Modular - grande" loading="lazy">
+          <h3>Sofá Modular</h3>
+          <p class="detalle-tecnico">Madera: Roble | Tela: Lino Gris Oscuro</p>
+          <p class="precio">$3.200.000 (Precio base)</p>
+        </div>
+        
+        <div class="card" data-category="poltronas" data-tela="Terciopelo Verde" data-madera="Amarilla" data-precio="$550.000 (Precio base)" data-medidas="80 cm (Largo) x 85 cm (Ancho) x 90 cm (Profundidad)" data-imagen="Sofas/poltrona-clasica-ortiz.jpg">
+          <img src="Sofas/Silla y Poltronas/IMG_20200725_115934.jpg" alt="Poltrona Movible" loading="lazy">
+          <h3>Poltrona Movible</h3>
+          <p class="detalle-tecnico">Madera: Amarilla | Tela: Terciopelo Verde</p>
+          <p class="precio">$550.000 (Precio base)</p>
+        </div>
+        
+        <div class="card" data-category="poltronas" data-tela="Lino rosa" data-madera="Pino" data-precio="$480.000 (Precio base)" data-medidas="70 cm (Largo) x 80 cm (Ancho) x 75 cm (Profundidad)" data-imagen="Sofas/poltrona-lounge-cuero.jpg">
+          <img src="Sofas/Silla y Poltronas/IMG_20190213_125508.jpg" alt="Poltrona Lino rosa" loading="lazy">
+          <h3>Poltrona Lino rosa</h3>
+          <p class="detalle-tecnico">Madera: Pino | Tela: Lino rosa</p>
+          <p class="precio">$480.000 (Precio base)</p>
+        </div>
+        
+        <div class="card" data-category="cabeceros" data-tela="Cuero Sintético Cafe" data-madera="Cedro" data-precio="$1.000.000 (Precio base)" data-medidas="160 cm (Largo) x 10 cm (Ancho) x 140 cm (Profundidad)" data-imagen="Sofas/cabecero-capitone.jpg">
+          <img src="Sofas/Camas/IMG_20220616_105206.jpg" alt="Cabecero sencillo - Base de cama" loading="lazy">
+          <h3>Cabecero sencillo</h3>
+          <p class="detalle-tecnico">Madera: Cedro | Tela: Cuero Sintético Cafe</p>
+          <p class="precio">$1.000.000 (Precio base)</p>
+        </div>
+        
+        <div class="card" data-category="cabeceros" data-tela="terciopelo Gris" data-madera="MDF" data-precio="$420.000 (Precio base)" data-medidas="140 cm (Largo) x 5 cm (Ancho) x 120 cm (Profundidad)" data-imagen="Sofas/cabecero-minimalista.jpg">
+          <img src="Sofas/Camas/DSC_2399.JPG" alt="Cabecero Minimalista" loading="lazy">
+          <h3>Cabecero Minimalista</h3>
+          <p class="detalle-tecnico">Madera: MDF | Tela: terciopelo Gris</p>
+          <p class="precio">$420.000 (Precio base)</p>
+        </div>
+        
+        <div class="card" data-category="puffs" data-tela="Cuero Sintetico Gris" data-madera="Amarilla" data-precio="$520.000 (Precio base)" data-medidas="50 cm (Largo) x 50 cm (Ancho) x 40 cm (Profundidad)" data-imagen="Sofas/puff-redondo.jpg">
+          <img src="Sofas/IMG_20200912_134411.jpg" alt="Puff redondo con almacenamiento" loading="lazy">
+          <h3>Puff rectagural con almacenamiento</h3>
+          <p class="detalle-tecnico">Madera: Amarilla | Tela: Cuero Sintetico Gris</p>
+          <p class="precio">$520.000 (Precio base)</p>
+        </div>
+        
+        <div class="card" data-category="puffs" data-tela="Cuero Sintetico Gris" data-madera="Pino" data-precio="$680.000 (Precio base)" data-medidas="60 cm (Largo) x 60 cm (Ancho) x 45 cm (Profundidad)" data-imagen="Sofas/puff-cuadrado-boucle.jpg">
+          <img src="Sofas/IMG_20200703_150618.jpg" alt="Puff cuadrado" loading="lazy">
+          <h3>Puff Cuadrado con compartimientos</h3>
+          <p class="detalle-tecnico">Madera: Pino | Tela: Cuero Sintetico Gris</p>
+          <p class="precio">$680.000 (Precio base)</p>
+        </div>
+        
+        <div class="card" data-category="bases" data-tela="Chenille" data-madera="Cedro" data-precio="$800.000 (Precio base)" data-medidas="200 cm (Largo) x 140 cm (Ancho) x 30 cm (Profundidad)" data-imagen="Sofas/base-cama-doble.jpg">
+          <img src="Sofas/Camas/DSC_0030.jpg" alt="Base Cama Doble" loading="lazy">
+          <h3>Base Cama Doble</h3>
+          <p class="detalle-tecnico">Madera: Cedro | Tela: Chenille</p>
+          <p class="precio">$800.000 (Precio base)</p>
+        </div>
+        
+        <div class="card" data-category="bases" data-tela="Terciopelo Azul Oscuro" data-madera="Pino" data-precio="$1.800.000 (Precio base)" data-medidas="200 cm (Largo) x 160 cm (Ancho) x 35 cm (Profundidad)" data-imagen="Sofas/base-cama-queen.jpg">
+          <img src="Sofas/Camas/IMG_20190409_124123.jpg" alt="Base Cama Queen Reforzada" loading="lazy">
+          <h3>Base Cama Queen Reforzada</h3>
+          <p class="detalle-tecnico">Madera: Pino | Tela: Terciopelo Azul Oscuro</p>
+          <p class="precio">$1.800.000 (Precio base)</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section id="refaccion" class="refaccion-section">
+    <div class="container">
+        <h2>Servicios de Refacción y Restauración</h2>
+        <p class="section-desc">Nos especializamos en renovar la cojinería (tela, espuma y componentes) de tus sofás, poltronas y sillas de comedor sin modificar la estructura de madera. Envía tu solicitud para cotización.</p>
+        <div class="refaccion-grid">
+            
+            <div class="refaccion-form-card">
+                <h3>Solicitar Cotización de Refacción</h3>
+                <p>Envíanos tus datos y los detalles del mueble a refaccionar. Nos comunicaremos para solicitar fotos y ofrecerte una cotización precisa.</p>
+                <form id="refaccion-form">
+                    <label>Nombre Completo</label>
+                    <input type="text" id="ref_nombre" name="nombre" required>
+                    <label>Correo Electrónico</label>
+                    <input type="email" id="ref_correo" name="correo" required>
+                    <label>Teléfono / WhatsApp</label>
+                    <input type="text" id="ref_telefono" name="telefono" placeholder="(Ej: 3157847087)" required>
+                    <label>Tipo de Mueble a Refaccionar</label>
+                    <textarea id="ref_detalles" name="detalles" rows="3" placeholder="Ej: Sofá de 2 cuerpos, 4 sillas de comedor, Poltrona antigua." required></textarea>
+                    <div class="form-message" id="refaccion-form-message"></div>
+                    <button type="submit" class="btn">Enviar Solicitud de Refacción</button>
+                </form>
+            </div>
+            
+            <div class="beneficio">
+                <h3>🛋️ Refacción de Sofás y Poltronas</h3>
+                <p>Cambio total de cojinería y tapicería para dejarlos como nuevos. *Si deseas cambio estructural, se cotiza como producto nuevo.*</p>
+            </div>
+            
+            <div class="beneficio">
+                <h3>🪑 Refacción y Personalización</h3>
+                <p>Renovamos la cojinería de tus sillas. Además, puedes elegir la tela, color y densidad de espumas en todos nuestros proyectos.</p>
+            </div>
+
+        </div>
+    </div>
+  </section>
+
+  <section id="galeria" class="galeria">
+    <div class="container">
+      <h2>Galería de Proyectos</h2>
+      <div class="grid-galeria">
+        <img src="Sofas/DSC_2461.JPG" alt="Mueble sala">
+        <img src="Sofas/Silla y Poltronas/IMG_20210511_133157.jpg" alt="Mueble comedor">
+        <img src="Sofas/Camas/DSC_0022.JPG" alt="Mueble dormitorio">
+  <img src="Sofas/IMG_20200627_152532.jpg" alt="Mueble sala grande">
+      </div>
+    </div>
+  </section>
+  <section id="testimonios" class="testimonios">
+    <div class="container">
+      <h2>Lo que dicen nuestros clientes</h2>
+      <div class="grid">
+        <blockquote>
+          "El sofá que compramos superó nuestras expectativas, elegante y muy cómodo."  
+          <span>- María Gómez</span>
+        </blockquote>
+        <blockquote>
+          "Excelente atención y muebles de gran calidad. 100% recomendados."  
+          <span>- Juan Pérez</span>
+        </blockquote>
+        <blockquote>
+          "Gran calidad, telas duraderas y excelentes acabados."  
+          <span>- Eugenia Higuera</span>
+        </blockquote><blockquote>
+          "Muebles hechos con amor y detalle, cumplen lo que pedido y la visión de sus Clientes."  
+          <span>- Pablo Blanco</span>
+        </blockquote>
+      </div>
+    </div>
+  </section>
+
+  <section id="pedidos" class="pedidos">
+    <div class="container">
+      <h2>Inicia tu Proyecto con Orlando Ortiz Muebles</h2>
+      <p class="section-desc">Elige la ruta que se adapta a tu idea: cita directa para diseño exclusivo o solicitud de personalización de catálogo.</p>
+      
+      <div class="grid-pedidos">
+          
+    <div class="card-pedido card-cita">
+      <h3>Diseño Desde Cero (Cita con el Dueño)</h3>
+      <p>Si tu proyecto es único o incluye cambios estructurales, agenda una cita. <strong>La facturación se realiza después de la reunión de certificación.</strong></p>
+      <form id="cita-form" autocomplete="on">
+  <fieldset>
+          <legend>Datos para la cita</legend>
+          <div class="form-group">
+            <label for="cita_nombre">Nombre Completo</label>
+            <input type="text" id="cita_nombre" name="nombre" required aria-required="true" aria-label="Nombre Completo" autocomplete="name" placeholder="Ej: Juan Pérez">
+            <div class="error-message" id="error-cita-nombre"></div>
+          </div>
+          <div class="form-group">
+            <label for="cita_correo">Correo Electrónico</label>
+            <input type="email" id="cita_correo" name="correo" required aria-required="true" aria-label="Correo Electrónico" autocomplete="email" placeholder="ejemplo@email.com">
+            <div class="error-message" id="error-cita-correo"></div>
+          </div>
+          <div class="form-group">
+            <label for="cita_telefono">Teléfono / WhatsApp</label>
+            <input type="tel" id="cita_telefono" name="telefono" required aria-required="true" aria-label="Teléfono o WhatsApp" autocomplete="tel" pattern="[0-9]{10,}" placeholder="3157847087">
+            <div class="error-message" id="error-cita-telefono"></div>
+          </div>
+          <div class="form-group">
+            <label for="cita_detalles">Describa brevemente su idea</label>
+            <textarea id="cita_detalles" name="detalles" rows="3" required aria-required="true" aria-label="Detalles de la idea" placeholder="Ej: Sofá modular con chaise longue, Base de cama con cabecero en terciopelo."></textarea>
+            <div class="error-message" id="error-cita-detalles"></div>
+          </div>
+        </fieldset>
+        <button type="submit" class="btn" aria-label="Solicitar Cita Directa">Solicitar Cita Directa</button>
+  <div class="form-message" id="cita-form-message"></div>
+      </form>
+    </div>
+
+    <div class="card-pedido card-catalogo">
+      <h3>Solicitud de Personalización (Catálogo)</h3>
+      <p>Selecciona un producto, personaliza la tela y la madera, y envía la solicitud. <strong>Recibirás un correo de certificación antes de la factura.</strong></p>
+      <form id="catalogo-form" enctype="multipart/form-data" autocomplete="on">
+  <fieldset>
+          <legend>Datos del Cliente</legend>
+          <div class="form-group">
+            <label for="cat_nombre">Nombre Completo</label>
+            <input type="text" id="cat_nombre" name="cat_nombre" required aria-required="true" aria-label="Nombre Completo" autocomplete="name" placeholder="Ej: Juan Pérez">
+            <div class="error-message" id="error-cat-nombre"></div>
+          </div>
+          <div class="form-group">
+            <label for="cat_correo">Correo Electrónico</label>
+            <input type="email" id="cat_correo" name="cat_correo" required aria-required="true" aria-label="Correo Electrónico" autocomplete="email" placeholder="ejemplo@email.com">
+            <div class="error-message" id="error-cat-correo"></div>
+          </div>
+          <div class="form-group">
+            <label for="cat_telefono">Teléfono / WhatsApp</label>
+            <input type="tel" id="cat_telefono" name="cat_telefono" required aria-required="true" aria-label="Teléfono o WhatsApp" autocomplete="tel" pattern="[0-9]{10,}" placeholder="3157847087">
+            <div class="error-message" id="error-cat-telefono"></div>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Personalización</legend>
+          <div class="form-group">
+            <label for="cat_producto">Nombre del Producto (del Catálogo)</label>
+            <input type="text" id="cat_producto" name="cat_producto" required aria-required="true" aria-label="Código o Nombre del Producto" placeholder="Ej: Poltrona Rústica, Silla Comedor Refacción">
+            <div class="error-message" id="error-cat-producto"></div>
+          </div>
+          <div class="form-group">
+            <label for="cat_tela">Tipo de Tela</label>
+            <input type="text" id="cat_tela" name="cat_tela" required aria-required="true" aria-label="Tipo de Tela" placeholder="Ej: Lino, Cuero Sintético, Terciopelo">
+            <div class="error-message" id="error-cat-tela"></div>
+          </div>
+          <div class="form-group">
+            <label for="cat_madera">Tipo de Madera (Estructura base)</label>
+            <select id="cat_madera" name="cat_madera" required aria-required="true" aria-label="Tipo de Madera">
+              <option value="">Seleccione el tipo de madera</option>
+              <option value="cedro">Cedro</option>
+              <option value="amarilla">Amarilla</option>
+            </select>
+            <div class="error-message" id="error-cat-madera"></div>
+          </div>
+          <div class="form-group">
+            <label for="cat_color_diseno">Diseño Decorativo / Color de Tela</label>
+            <input type="text" id="cat_color_diseno" name="cat_color_diseno" required aria-required="true" aria-label="Diseño Decorativo o Color de Tela" placeholder="Ej: Color Rojo o Patrón Geométrico">
+            <div class="error-message" id="error-cat-color-diseno"></div>
+          </div>
+          <div class="form-group">
+            <label for="cat_diseno_img">Imagen del Diseño Deseado (Opcional, solo PNG)</label>
+            <input type="file" id="cat_diseno_img" name="cat_diseno_img" accept=".png" aria-label="Imagen del Diseño Deseado">
+            <div class="error-message" id="error-cat-diseno-img"></div>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Datos de Entrega</legend>
+          <div class="form-group">
+            <label for="cat_direccion">Dirección de Entrega Completa</label>
+            <input type="text" id="cat_direccion" name="cat_direccion" required aria-required="true" aria-label="Dirección de Entrega" autocomplete="street-address" placeholder="Calle 10 # 10-10, Barrio/Zona">
+            <div class="error-message" id="error-cat-direccion"></div>
+          </div>
+          <div class="form-group">
+            <label for="cat_ciudad">Ciudad / Municipio</label>
+            <input type="text" id="cat_ciudad" name="cat_ciudad" required aria-required="true" aria-label="Ciudad o Municipio" autocomplete="address-level2" placeholder="Bogotá o Municipio de Cundinamarca">
+            <div class="error-message" id="error-cat-ciudad"></div>
+          </div>
+          <div class="form-group">
+            <label for="cat_acceso">Detalles de Acceso</label>
+            <textarea id="cat_acceso" name="cat_acceso" rows="2" aria-label="Detalles de Acceso" placeholder="Ej: Conjunto cerrado Torres, Piso 5 por ascensor estrecho"></textarea>
+            <div class="error-message" id="error-cat-acceso"></div>
+          </div>
+          <div class="form-group">
+            <label for="cat_recibe">Persona que Recibe (Nombre y Teléfono)</label>
+            <input type="text" id="cat_recibe" name="cat_recibe" required aria-required="true" aria-label="Persona que Recibe" placeholder="Ej: Ana Pérez, 3001234567">
+            <div class="error-message" id="error-cat-recibe"></div>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Opciones de Pago</legend>
+          <div class="form-group">
+            <label for="cat_metodo_pago">Método de Pago</label>
+            <select id="cat_metodo_pago" name="cat_metodo_pago" required aria-required="true" aria-label="Método de Pago">
+              <option value="">Seleccione un método</option>
+              <option value="efectivo">Efectivo</option>
+              <option value="nequi">Nequi</option>
+              <option value="pse">Transferencia PSE</option>
+            </select>
+            <div class="error-message" id="error-cat-metodo-pago"></div>
+          </div>
+          <div class="form-group">
+            <label for="cat_dinamica_pago">Dinámica de Pago</label>
+            <select id="cat_dinamica_pago" name="cat_dinamica_pago" required aria-required="true" aria-label="Dinámica de Pago">
+              <option value="">Seleccione una modalidad</option>
+              <option value="contado">Contado (100% al inicio)</option>
+              <option value="parcial">50% Inicial + 50% Contraentrega</option>
+            </select>
+            <div class="error-message" id="error-cat-dinamica-pago"></div>
+          </div>
+        </fieldset>
+        <button type="submit" class="btn" aria-label="Enviar Solicitud de Certificación">Enviar Solicitud de Certificación</button>
+  <div class="form-message" id="catalogo-form-message"></div>
+      </form>
+    </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section id="auth" class="auth-section">
+      <div class="container">
+        <h2>Registro e Inicio de Sesión</h2>
+        <p class="section-desc">Crea tu cuenta para guardar tus pedidos y contactarte con nuestro equipo.</p>
+        <div class="login-form-card" id="login-card">
+          <h3>Iniciar Sesión</h3>
+          <form id="login-form" autocomplete="on">
+            <fieldset>
+              <legend>Datos de acceso</legend>
+              <div class="form-group">
+                <label for="login_usuario">Correo o Teléfono</label>
+                <input type="text" id="login_usuario" name="usuario" required aria-required="true" aria-label="Correo o Teléfono" autocomplete="username" placeholder="Correo o Teléfono">
+                <div class="error-message" id="error-login-usuario"></div>
+              </div>
+              <div class="form-group">
+                <label for="login_password">Contraseña</label>
+                <input type="password" id="login_password" name="password" required aria-required="true" aria-label="Contraseña" autocomplete="current-password" placeholder="Tu contraseña">
+                <div class="error-message" id="error-login-password"></div>
+              </div>
+            </fieldset>
+            <div class="form-message" id="login-form-message"></div>
+            <button type="submit" class="btn" id="login-submit-btn" aria-label="Ingresar">Ingresar</button>
+          </form>
+        </div>
+        <div id="admin-portal" style="display:none">
+          <h2>Portal Administrativo</h2>
+          <button class="btn" id="logout-btn">Cerrar Sesión</button>
+          <div class="admin-tabs">
+            <button class="btn admin-tab" data-tab="refaccion">Refacciones</button>
+            <button class="btn admin-tab" data-tab="cita">Citas</button>
+            <button class="btn admin-tab" data-tab="personalizacion">Personalizaciones</button>
+          </div>
+          <div id="admin-content">
+            <div id="admin-refaccion" class="admin-table-container" style="display:none"></div>
+            <div id="admin-cita" class="admin-table-container" style="display:none"></div>
+            <div id="admin-personalizacion" class="admin-table-container" style="display:none"></div>
+          </div>
+        </div>
+      </div>
+
+  <style>
+    .admin-tabs { margin: 2em 0 1em 0; }
+    .admin-tab { margin-right: 1em; background: #eee; color: #333; border: 1px solid #bbb; }
+    .admin-tab.active { background: #4a90e2; color: #fff; }
+    .admin-table-container { margin-top: 1em; }
+    table.admin-table { width: 100%; border-collapse: collapse; margin-bottom: 2em; }
+    table.admin-table th, table.admin-table td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    table.admin-table th { background: #f5f5f5; }
+    .admin-action-btn { background: #357ab8; color: #fff; border: none; border-radius: 4px; padding: 0.3em 1em; cursor: pointer; margin-right: 0.5em; }
+    .admin-action-btn.closed { background: #aaa; }
+  </style>
+  </section>
+
+  <style>
+    .login-form-card {
+      max-width: 400px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      padding: 2em 2em 1.5em 2em;
+    }
+    .login-form-card h3 {
+      text-align: center;
+      margin-bottom: 1em;
+    }
+    #login-form fieldset {
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 1em;
+      margin-bottom: 1em;
+    }
+    #login-form legend {
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 0.5em;
+    }
+    #login-form .form-group {
+      margin-bottom: 1.2em;
+    }
+    #login-form label {
+      display: block;
+      margin-bottom: 0.2em;
+      font-weight: 500;
+    }
+    #login-form input {
+      width: 100%;
+      padding: 0.5em;
+      border-radius: 5px;
+      border: 1px solid #bbb;
+      font-size: 1em;
+      margin-bottom: 0.2em;
+    }
+    #login-form input:focus {
+      outline: 2px solid #4a90e2;
+      border-color: #4a90e2;
+    }
+    #login-form .error-message {
+      color: #c00;
+      font-size: 0.95em;
+      margin-bottom: 0.5em;
+      display: none;
+    }
+    #login-form input.invalid {
+      border: 2px solid #c00;
+      background: #fff0f0;
+    }
+  </style>
+
+  <script>
+  // --- LOGIN Y PORTAL ADMIN ---
+  const ADMIN_USER = 'admin@ortizmuebles.com';
+  const ADMIN_PASS = 'admin2025';
+  let adminLogged = false;
+
+  function showAdminPortal() {
+    document.getElementById('login-card').style.display = 'none';
+    document.getElementById('admin-portal').style.display = 'block';
+    adminLogged = true;
+    loadAdminTab('refaccion');
+  }
+  function hideAdminPortal() {
+    document.getElementById('login-card').style.display = '';
+    document.getElementById('admin-portal').style.display = 'none';
+    adminLogged = false;
+  }
+  document.getElementById('login-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const user = document.getElementById('login_usuario').value.trim();
+    const pass = document.getElementById('login_password').value;
+    const msg = document.getElementById('login-form-message');
+    msg.textContent = '';
+    if (user === ADMIN_USER && pass === ADMIN_PASS) {
+      showAdminPortal();
+      msg.textContent = '';
+      this.reset();
+      // Cambia el texto del botón de login
+      const loginBtn = document.getElementById('login-button');
+      if (loginBtn) {
+        loginBtn.textContent = 'Bienvenido(a)';
+        loginBtn.style.fontWeight = 'bold';
+      }
+    } else {
+      msg.textContent = 'Usuario o contraseña incorrectos.';
+      msg.style.color = 'red';
+    }
+  });
+  document.getElementById('logout-btn').addEventListener('click', function() {
+    hideAdminPortal();
+    // Restaurar texto y estilo del botón de login
+    const loginBtn = document.getElementById('login-button');
+    if (loginBtn) {
+      loginBtn.textContent = 'Iniciar Sesión';
+      loginBtn.style.fontWeight = '';
+    }
+  });
+  // Tabs
+  document.querySelectorAll('.admin-tab').forEach(btn => {
+    btn.addEventListener('click', function() {
+      loadAdminTab(this.dataset.tab);
+    });
+  });
+  function loadAdminTab(tab) {
+    document.querySelectorAll('.admin-tab').forEach(btn => btn.classList.remove('active'));
+    document.querySelector(`.admin-tab[data-tab="${tab}"]`).classList.add('active');
+    document.querySelectorAll('.admin-table-container').forEach(div => div.style.display = 'none');
+    document.getElementById(`admin-${tab}`).style.display = 'block';
+    loadAdminData(tab);
+  }
+  // Cargar datos de backend y renderizar tablas
+  async function loadAdminData(tab) {
+    let url = '';
+    if (tab === 'refaccion') url = `${API_BASE}/refaccion`;
+    if (tab === 'cita') url = `${API_BASE}/cita`;
+    if (tab === 'personalizacion') url = `${API_BASE}/personalizacion`;
+    const container = document.getElementById(`admin-${tab}`);
+    container.innerHTML = 'Cargando...';
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+      container.innerHTML = renderAdminTable(tab, data);
+      // Botones de acción
+      container.querySelectorAll('.admin-action-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          this.classList.toggle('closed');
+          this.textContent = this.classList.contains('closed') ? 'Cerrado' : 'Cerrar';
+        });
+      });
+    } catch (err) {
+      container.innerHTML = 'Error al cargar los datos.';
+    }
+  }
+  function renderAdminTable(tab, data) {
+    if (!Array.isArray(data) || data.length === 0) return '<p>No hay registros.</p>';
+    let html = '<table class="admin-table"><thead><tr>';
+    if (tab === 'refaccion') {
+      html += '<th>Nombre</th><th>Correo</th><th>Teléfono</th><th>Detalles</th><th>Fecha</th><th>Acción</th></tr></thead><tbody>';
+      data.forEach(r => {
+        html += `<tr>
+          <td>${r.nombre}</td>
+          <td>
+            ${r.correo}
+            <a href="mailto:${r.correo}" title="Contactar por correo" class="admin-contact-btn">📧</a>
+          </td>
+          <td>
+            ${r.telefono}
+            <a href="https://wa.me/57${r.telefono.replace(/[^0-9]/g,'')}" target="_blank" title="Contactar por WhatsApp" class="admin-contact-btn">🟢</a>
+          </td>
+          <td>${r.detalles}</td>
+          <td>${(r.fecha||'').slice(0,10)}</td>
+          <td><button class='admin-action-btn'>Cerrar</button></td>
+        </tr>`;
+      });
+    } else if (tab === 'cita') {
+      html += '<th>Nombre</th><th>Correo</th><th>Teléfono</th><th>Detalles</th><th>Fecha</th><th>Acción</th></tr></thead><tbody>';
+      data.forEach(r => {
+        html += `<tr>
+          <td>${r.nombre}</td>
+          <td>
+            ${r.correo}
+            <a href="mailto:${r.correo}" title="Contactar por correo" class="admin-contact-btn">📧</a>
+          </td>
+          <td>
+            ${r.telefono}
+            <a href="https://wa.me/57${r.telefono.replace(/[^0-9]/g,'')}" target="_blank" title="Contactar por WhatsApp" class="admin-contact-btn">🟢</a>
+          </td>
+          <td>${r.detalles}</td>
+          <td>${(r.fecha||'').slice(0,10)}</td>
+          <td><button class='admin-action-btn'>Cerrar</button></td>
+        </tr>`;
+      });
+    } else if (tab === 'personalizacion') {
+      html += '<th>Nombre</th><th>Correo</th><th>Teléfono</th><th>Producto</th><th>Tela</th><th>Madera</th><th>Color/Diseño</th><th>Dirección</th><th>Ciudad</th><th>Recibe</th><th>Pago</th><th>Dinámica</th><th>Fecha</th><th>Acción</th></tr></thead><tbody>';
+      data.forEach(r => {
+        html += `<tr>
+          <td>${r.cat_nombre}</td>
+          <td>
+            ${r.cat_correo}
+            <a href="mailto:${r.cat_correo}" title="Contactar por correo" class="admin-contact-btn">📧</a>
+          </td>
+          <td>
+            ${r.cat_telefono}
+            <a href="https://wa.me/57${r.cat_telefono.replace(/[^0-9]/g,'')}" target="_blank" title="Contactar por WhatsApp" class="admin-contact-btn">🟢</a>
+          </td>
+          <td>${r.cat_producto}</td>
+          <td>${r.cat_tela}</td>
+          <td>${r.cat_madera}</td>
+          <td>${r.cat_color_diseno}</td>
+          <td>${r.cat_direccion}</td>
+          <td>${r.cat_ciudad}</td>
+          <td>${r.cat_recibe}</td>
+          <td>${r.cat_metodo_pago}</td>
+          <td>${r.cat_dinamica_pago}</td>
+          <td>${(r.fecha||'').slice(0,10)}</td>
+          <td><button class='admin-action-btn'>Cerrar</button></td>
+        </tr>`;
+      });
+    }
+    html += '</tbody></table>';
+    return html;
+  }
+  // Validación visual en tiempo real para el formulario de inicio de sesión
+  function setErrorLogin(input, message) {
+    input.classList.add('invalid');
+    const errorDiv = document.getElementById('error-' + input.id.replace(/_/g,'-'));
+    if (errorDiv) {
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+    }
+  }
+  function clearErrorLogin(input) {
+    input.classList.remove('invalid');
+    const errorDiv = document.getElementById('error-' + input.id.replace(/_/g,'-'));
+    if (errorDiv) {
+      errorDiv.textContent = '';
+      errorDiv.style.display = 'none';
+    }
+  }
+  function validateInputLogin(input) {
+    if (input.required && !input.value.trim()) {
+      setErrorLogin(input, 'Este campo es obligatorio.');
+      return false;
+    }
+    clearErrorLogin(input);
+    return true;
+  }
+  function setupLoginFormValidation() {
+    const form = document.getElementById('login-form');
+    if (!form) return;
+    const inputs = form.querySelectorAll('input');
+    inputs.forEach(input => {
+      input.addEventListener('input', function() {
+        validateInputLogin(input);
+      });
+      input.addEventListener('blur', function() {
+        validateInputLogin(input);
+      });
+    });
+    form.addEventListener('submit', function(e) {
+      let valid = true;
+      inputs.forEach(input => {
+        if (!validateInputLogin(input)) valid = false;
+      });
+      if (!valid) {
+        e.preventDefault();
+      }
+    });
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    setupLoginFormValidation();
+  });
+  </script>
+
+  <section id="contacto" class="contacto">
+    <div class="container">
+      <h2>Contáctanos y Visítanos</h2>
+      <p>📍 Cra 29c #74-06, Barrios Unidos, Bogotá (Punto de Exhibición y Taller)</p>
+      <p>📞 315 784 7087 (Atención Personalizada)</p>
+      <p>✉️ contacto@ortizmuebles.com</p>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>&copy; 2025 Orlando Ortiz Muebles - Diseño Artesanal - Todos los derechos reservados</p>
+  </footer>
+  
+  <div id="product-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <div class="modal-body">
+            <h2 id="modal-titulo"></h2>
+            <div class="modal-grid">
+                <div class="modal-image-container">
+                    <img id="modal-imagen" src="" alt="Imagen del Producto">
+                </div>
+                <div class="modal-specs">
+                    <h3>Especificaciones Técnicas</h3>
+                    <div class="spec-item">
+                        <label>Tipo de Tela:</label>
+                        <p id="modal-tela"></p>
+                    </div>
+                    <div class="spec-item">
+                        <label>Tipo de Madera:</label>
+                        <p id="modal-madera"></p>
+                    </div>
+                    <div class="spec-item">
+                        <label>Precio Base:</label>
+                        <p id="modal-precio"></p>
+                    </div>
+                    <hr>
+                    <div class="spec-item">
+                        <label>Medidas (Largo x Ancho x Profundidad):</label>
+                        <p id="modal-medidas"></p>
+                    </div>
+                    <button class="btn modal-btn-pedido" onclick="window.location.hash='#pedidos'">Solicitar Personalización</button>
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+  
+  <script src="Func.js"></script>
+  <script>
+  // --- INTEGRACIÓN BACKEND FORMULARIOS ---
+  // Cambia esta URL si tu backend está en otro puerto o dominio
+  const API_BASE = 'https://sofasback.onrender.com/api';
+
+  // Refacción
+  document.getElementById('refaccion-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const data = {
+      nombre: document.getElementById('ref_nombre').value,
+      correo: document.getElementById('ref_correo').value,
+      telefono: document.getElementById('ref_telefono').value,
+      detalles: document.getElementById('ref_detalles').value
+    };
+    const msg = document.getElementById('refaccion-form-message');
+    msg.textContent = '';
+    msg.style.color = '';
+    try {
+      const res = await fetch(`${API_BASE}/refaccion`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (res.ok) {
+        msg.textContent = '¡Solicitud enviada correctamente!';
+        msg.style.color = 'green';
+        this.reset();
+      } else {
+        const err = await res.json();
+        msg.textContent = err.error || 'Error al enviar la solicitud.';
+        msg.style.color = 'red';
+      }
+    } catch (err) {
+      msg.textContent = 'Error de conexión con el servidor.';
+      msg.style.color = 'red';
+    }
+  });
+
+  // Cita
+  document.getElementById('cita-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const data = {
+      nombre: document.getElementById('cita_nombre').value,
+      correo: document.getElementById('cita_correo').value,
+      telefono: document.getElementById('cita_telefono').value,
+      detalles: document.getElementById('cita_detalles').value
+    };
+    const msg = document.getElementById('cita-form-message');
+    msg.textContent = '';
+    msg.style.color = '';
+    try {
+      const res = await fetch(`${API_BASE}/cita`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (res.ok) {
+        msg.textContent = '¡Solicitud enviada correctamente!';
+        msg.style.color = 'green';
+        this.reset();
+      } else {
+        const err = await res.json();
+        msg.textContent = err.error || 'Error al enviar la solicitud.';
+        msg.style.color = 'red';
+      }
+    } catch (err) {
+      msg.textContent = 'Error de conexión con el servidor.';
+      msg.style.color = 'red';
+    }
+  });
+
+  // Personalización (Catálogo)
+  document.getElementById('catalogo-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const form = this;
+    const formData = new FormData(form);
+    // Si hay imagen, la subimos como base64 (simple, no recomendado para archivos grandes)
+    const imgInput = document.getElementById('cat_diseno_img');
+    if (imgInput && imgInput.files && imgInput.files[0]) {
+      const file = imgInput.files[0];
+      const reader = new FileReader();
+      reader.onload = async function(ev) {
+        formData.set('cat_diseno_img', ev.target.result); // base64
+        await sendPersonalizacion(formData, form);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      await sendPersonalizacion(formData, form);
+    }
+  });
+
+  async function sendPersonalizacion(formData, form) {
+    const msg = document.getElementById('catalogo-form-message');
+    msg.textContent = '';
+    msg.style.color = '';
+    // Convertir FormData a objeto plano
+    const data = {};
+    formData.forEach((v, k) => { data[k] = v; });
+    try {
+      const res = await fetch(`${API_BASE}/personalizacion`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (res.ok) {
+        msg.textContent = '¡Solicitud enviada correctamente!';
+        msg.style.color = 'green';
+        form.reset();
+      } else {
+        const err = await res.json();
+        msg.textContent = err.error || 'Error al enviar la solicitud.';
+        msg.style.color = 'red';
+      }
+    } catch (err) {
+      msg.textContent = 'Error de conexión con el servidor.';
+      msg.style.color = 'red';
+    }
+  }
+  </script>
+  <script>
+    // Validación visual en tiempo real para ambos formularios
+    function setError(input, message) {
+      input.classList.add('invalid');
+      const errorDiv = document.getElementById('error-' + input.id.replace(/_/g,'-'));
+      if (errorDiv) {
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+      }
+    }
+    function clearError(input) {
+      input.classList.remove('invalid');
+      const errorDiv = document.getElementById('error-' + input.id.replace(/_/g,'-'));
+      if (errorDiv) {
+        errorDiv.textContent = '';
+        errorDiv.style.display = 'none';
+      }
+    }
+    function validateInput(input) {
+      if (input.type === 'email') {
+        if (!input.value.match(/^\S+@\S+\.\S+$/)) {
+          setError(input, 'Correo electrónico inválido.');
+          return false;
+        }
+      } else if (input.type === 'tel') {
+        if (!input.value.match(/^[0-9]{10,}$/)) {
+          setError(input, 'Ingrese un número de teléfono válido (10 dígitos).');
+          return false;
+        }
+      } else if (input.required && !input.value.trim()) {
+        setError(input, 'Este campo es obligatorio.');
+        return false;
+      } else if (input.tagName === 'SELECT' && input.required && !input.value) {
+        setError(input, 'Seleccione una opción.');
+        return false;
+      }
+      clearError(input);
+      return true;
+    }
+    function setupFormValidation(formId) {
+      const form = document.getElementById(formId);
+      if (!form) return;
+      const inputs = form.querySelectorAll('input,select,textarea');
+      inputs.forEach(input => {
+        input.addEventListener('input', function() {
+          validateInput(input);
+        });
+        input.addEventListener('blur', function() {
+          validateInput(input);
+        });
+      });
+      form.addEventListener('submit', function(e) {
+        let valid = true;
+        inputs.forEach(input => {
+          if (!validateInput(input)) valid = false;
+        });
+        if (!valid) {
+          e.preventDefault();
+        }
+      });
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+      setupFormValidation('cita-form');
+      setupFormValidation('catalogo-form');
+    });
+  </script>
+
+</body>
+</html>
