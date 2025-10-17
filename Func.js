@@ -62,12 +62,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 3. PEDIDO POR CATÁLOGO - REQUIERE LOGIN
+    // 3. PEDIDO POR CATÁLOGO - PERMITE INVITADOS
     if (catalogoForm) {
         catalogoForm.addEventListener('submit', function(event) {
-            // ❌ REQUIERE LOGIN: Si no hay sesión, se muestra el alert y se detiene el envío.
-            if (!validateLogin(event)) return; 
-            
             event.preventDefault(); // Detiene el envío de formulario HTML por defecto
 
             alert('¡Solicitud de Personalización Enviada! Gracias. En las próximas horas recibirás un **Correo de Certificación**...');
@@ -163,20 +160,96 @@ document.addEventListener('DOMContentLoaded', () => {
     // Función que genera el catálogo completo para cada categoría con la ruta 'sofas/'
     function generateDetailedProducts(category) {
         let html = '';
-        // Genera un número de productos aleatorio para simular un catálogo grande (15-20)
-        const numProducts = Math.floor(Math.random() * (20 - 15 + 1)) + 15; 
         const categoryMap = {
-            'sofases': { name: 'Sofá', tela: 'Lino Italiano', madera: 'Cedro', precio: '$850.000', medidas: 'Largo: 210cm | Ancho: 95cm | Profundidad: 80cm' },
-            'poltronas': { name: 'Poltrona', tela: 'Terciopelo', madera: 'Amarilla', precio: '$400.000', medidas: 'Largo: 75cm | Ancho: 80cm | Profundidad: 90cm' },
-            'cabeceros': { name: 'Cabecero', tela: 'Microfibra', madera: 'Pino', precio: '$300.000', medidas: 'Largo: 180cm | Ancho: 8cm | Profundidad: 130cm' },
-            'puffs': { name: 'Puff', tela: 'Pana', madera: 'MDF', precio: '$150.000', medidas: 'Largo: 55cm | Ancho: 55cm | Profundidad: 45cm' },
-            'bases': { name: 'Base Cama', tela: 'Chenille', madera: 'Roble', precio: '$600.000', medidas: 'Largo: 200cm | Ancho: 140cm | Profundidad: 30cm' },
+            'sofases': { 
+                name: 'Sofá', 
+                tela: 'Lino Italiano', 
+                madera: 'Cedro', 
+                precio: '$850.000', 
+                medidas: 'Largo: 210cm | Ancho: 95cm | Profundidad: 80cm',
+                images: [
+                    'IMG_20181221_172501.jpg',
+                    'IMG_20190201_133427.jpg',
+                    'IMG_20190212_161701.jpg',
+                    'IMG_20190212_162613.jpg',
+                    'IMG_20200627_152532.jpg',
+                    'IMG_20201120_112102.jpg',
+                    'IMG_20201120_121445.jpg',
+                    'IMG_20210419_161906.jpg',
+                    'IMG_20210419_162106.jpg',
+                    'IMG_20210419_163913.jpg',
+                    'chester.JPG'
+                ]
+            },
+            'poltronas': { 
+                name: 'Poltrona', 
+                tela: 'Terciopelo', 
+                madera: 'Amarilla', 
+                precio: '$400.000', 
+                medidas: 'Largo: 75cm | Ancho: 80cm | Profundidad: 90cm',
+                images: [
+                    'Silla y Poltronas/IMG_20200725_115934.jpg',
+                    'Silla y Poltronas/IMG_20190213_125508.jpg',
+                    'Silla y Poltronas/IMG_20210511_133157.jpg',
+                    'Silla y Poltronas/IMG_20200828_111812.jpg',
+                    'Silla y Poltronas/IMG_20200829_093516.jpg',
+                    'Silla y Poltronas/IMG_20210510_160733.jpg',
+                    'Silla y Poltronas/IMG_20220122_091348.jpg',
+                    'Silla y Poltronas/IMG_20220224_082104.jpg'
+                ]
+            },
+            'cabeceros': { 
+                name: 'Cabecero', 
+                tela: 'Microfibra', 
+                madera: 'Pino', 
+                precio: '$300.000', 
+                medidas: 'Largo: 180cm | Ancho: 8cm | Profundidad: 130cm',
+                images: [
+                    'Camas/IMG_20220616_105206.jpg',
+                    'Camas/DSC_2399.JPG',
+                    'Camas/DSC_0030.jpg',
+                    'Camas/IMG_20220616_103602.jpg',
+                    'Camas/IMG_20220616_114722.jpg',
+                    'Camas/DSC_0016.JPG',
+                    'Camas/DSC_0021.JPG'
+                ]
+            },
+            'puffs': { 
+                name: 'Puff', 
+                tela: 'Pana', 
+                madera: 'MDF', 
+                precio: '$150.000', 
+                medidas: 'Largo: 55cm | Ancho: 55cm | Profundidad: 45cm',
+                images: [
+                    'IMG_20200912_134411.jpg',
+                    'IMG_20200703_150618.jpg',
+                    'IMG_20220218_145625.jpg',
+                    'IMG_20220218_145634.jpg',
+                    'IMG_20210914_122100.jpg'
+                ]
+            },
+            'bases': { 
+                name: 'Base Cama', 
+                tela: 'Chenille', 
+                madera: 'Roble', 
+                precio: '$600.000', 
+                medidas: 'Largo: 200cm | Ancho: 140cm | Profundidad: 30cm',
+                images: [
+                    'Camas/IMG_20190409_124123.jpg',
+                    'Camas/DSC_0030.jpg',
+                    'Camas/IMG_20220204_191240.jpg',
+                    'Camas/IMG_20220205_125233.jpg',
+                    'Camas/IMG_20220616_114722.jpg',
+                    'Camas/IMG_20220623_103619.jpg'
+                ]
+            }
         };
         const productBase = categoryMap[category];
-        for (let i = 1; i <= numProducts; i++) {
-            // RUTA DE IMAGEN CORREGIDA: Apunta a la carpeta 'Sofas/' (mayúscula)
-            const imageName = `${category}_modelo_${i}.jpg`;
-            const imageSrc = `Sofas/${imageName}`;
+        const images = productBase.images;
+        const numProducts = images.length;
+
+        for (let i = 0; i < numProducts; i++) {
+            const imageSrc = `Sofas/${images[i]}`;
             const randomPrice = Math.floor(Math.random() * 500) + 200;
             const formattedPrice = (randomPrice * 1000).toLocaleString('es-CO');
             html += `
