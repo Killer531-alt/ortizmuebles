@@ -447,57 +447,125 @@
   <section id="admin" class="admin-section hidden-admin">
     <div class="container">
       <h2>Panel Administrativo</h2>
-      <p class="section-desc">Gestiona inventario y facturación desde aquí. Usa el backend local en <code>http://localhost:4000</code> por defecto o ajusta la constante <code>API_BASE</code> en <code>Func.js</code>.</p>
+      <p class="section-desc">Gestiona el inventario, facturación y pedidos desde un solo lugar.</p>
 
       <div class="admin-tabs">
         <button class="admin-tab active" data-tab="inventario">Inventario</button>
         <button class="admin-tab" data-tab="facturacion">Facturación</button>
+        <button class="admin-tab" data-tab="pedidos">Pedidos</button>
       </div>
 
-      <div class="admin-table-container">
-        <div id="inventario-panel" class="admin-panel">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-            <h3>Inventario</h3>
-            <div>
-              <button id="refresh-inventario" class="admin-action-btn">Refrescar</button>
-            </div>
+      <!-- Panel de Inventario -->
+      <div id="inventario-panel" class="admin-panel" style="display:block;">
+        <div class="admin-quick-actions">
+          <button id="btn-nuevo-material" class="admin-action-btn">+ Nuevo Material</button>
+          <button id="btn-bajos-stock" class="admin-action-btn">Ver Bajos en Stock</button>
+          <input type="text" id="buscar-inventario" placeholder="Buscar en inventario..." class="admin-search">
+        </div>
+
+        <div class="admin-table-container">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Material</th>
+                <th>Categoría</th>
+                <th>Stock</th>
+                <th>Precio</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="inventario-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Panel de Facturación -->
+      <div id="facturacion-panel" class="admin-panel" style="display:none;">
+        <div class="admin-quick-actions">
+          <button id="btn-nueva-factura" class="admin-action-btn">+ Nueva Factura</button>
+          <input type="date" id="fecha-factura" class="admin-date">
+          <select id="filtro-estado" class="admin-select">
+            <option value="">Todos los estados</option>
+            <option value="pendiente">Pendientes</option>
+            <option value="pagada">Pagadas</option>
+            <option value="cancelada">Canceladas</option>
+          </select>
+        </div>
+
+        <div class="admin-table-container">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Factura #</th>
+                <th>Cliente</th>
+                <th>Fecha</th>
+                <th>Total</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="factura-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Panel de Pedidos -->
+      <div id="pedidos-panel" class="admin-panel" style="display:none;">
+        <div class="admin-quick-actions">
+          <button id="btn-actualizar-pedidos" class="admin-action-btn">↻ Actualizar</button>
+          <select id="filtro-pedidos" class="admin-select">
+            <option value="">Todos los pedidos</option>
+            <option value="pendiente">Pendientes</option>
+            <option value="proceso">En Proceso</option>
+            <option value="completado">Completados</option>
+          </select>
+        </div>
+
+        <div class="admin-table-container">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Pedido #</th>
+                <th>Cliente</th>
+                <th>Producto</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="pedidos-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulario de Inventario (Modal) -->
+    <div id="form-overlay" class="form-overlay">
+      <form id="inventario-form" class="admin-form">
+        <h3>Nuevo Material</h3>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="inv_nombre">Nombre *</label>
+            <input type="text" id="inv_nombre" name="nombre" required>
           </div>
-
-          <!-- Panel de control rápido -->
-          <div class="admin-quick-actions">
-            <button id="btn-nuevo-material" class="admin-action-btn">+ Nuevo Material</button>
-            <button id="btn-bajos-stock" class="admin-action-btn">Ver Bajos en Stock</button>
-            <input type="text" id="buscar-inventario" placeholder="Buscar en inventario..." class="admin-search">
+          
+          <div class="form-group">
+            <label for="inv_categoria">Categoría *</label>
+            <select id="inv_categoria" name="categoria" required>
+              <option value="">Seleccionar</option>
+              <option value="madera">Madera</option>
+              <option value="tela">Tela</option>
+              <option value="espuma">Espuma</option>
+              <option value="herrajes">Herrajes</option>
+              <option value="pintura">Pintura</option>
+              <option value="producto">Producto Final</option>
+            </select>
           </div>
+        </div>
 
-          <!-- Formulario de inventario (inicialmente oculto) -->
-          <div id="form-overlay" class="form-overlay" style="display:none;">
-            <form id="inventario-form" class="admin-form" style="background: white; padding: 2em; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); max-width: 600px; margin: 2em auto;">
-              <h3 style="margin-top:0;">Nuevo Material</h3>
-              
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="inv_nombre">Nombre *</label>
-                  <input type="text" id="inv_nombre" required>
-                </div>
-                
-                <div class="form-group">
-                  <label for="inv_categoria">Categoría *</label>
-                  <select id="inv_categoria" required>
-                    <option value="">Seleccionar</option>
-                    <option value="madera">Madera</option>
-                    <option value="tela">Tela</option>
-                    <option value="espuma">Espuma</option>
-                    <option value="herrajes">Herrajes</option>
-                    <option value="pintura">Pintura</option>
-                    <option value="producto">Producto Final</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="inv_cantidad">Cantidad *</label>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="inv_cantidad">Cantidad *</label>
                   <input type="number" id="inv_cantidad" min="0" required>
                 </div>
 
@@ -717,15 +785,241 @@
       </div>
 
   <style>
-    .admin-tabs { margin: 2em 0 1em 0; }
-    .admin-tab { margin-right: 1em; background: #eee; color: #333; border: 1px solid #bbb; }
-    .admin-tab.active { background: #4a90e2; color: #fff; }
-    .admin-table-container { margin-top: 1em; }
-    table.admin-table { width: 100%; border-collapse: collapse; margin-bottom: 2em; }
-    table.admin-table th, table.admin-table td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
-    table.admin-table th { background: #f5f5f5; }
-    .admin-action-btn { background: #357ab8; color: #fff; border: none; border-radius: 4px; padding: 0.3em 1em; cursor: pointer; margin-right: 0.5em; }
-    .admin-action-btn.closed { background: #aaa; }
+    /* Estilos de pestañas admin */
+    .admin-tabs { 
+        margin: 2em 0 1em 0; 
+        display: flex;
+        gap: 0.5em;
+        flex-wrap: wrap;
+    }
+    
+    .admin-tab { 
+        background: #eee; 
+        color: #333; 
+        border: 1px solid #bbb;
+        padding: 0.8em 1.5em;
+        cursor: pointer;
+        border-radius: 4px;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+    
+    .admin-tab:hover {
+        background: #e0e0e0;
+    }
+    
+    .admin-tab.active { 
+        background: #4B708A; 
+        color: #fff;
+        border-color: #4B708A;
+    }
+
+    /* Estilos de tablas admin */
+    .admin-table-container { 
+        margin: 1em 0;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        overflow-x: auto;
+    }
+
+    table.admin-table { 
+        width: 100%; 
+        border-collapse: collapse; 
+        font-size: 0.97em;
+    }
+
+    table.admin-table th, 
+    table.admin-table td { 
+        border: 1px solid #eee; 
+        padding: 0.8em; 
+        text-align: left;
+    }
+
+    table.admin-table th { 
+        background: #f8f9fa;
+        font-size: 0.9em;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    table.admin-table tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    /* Controles y acciones */
+    .admin-action-btn { 
+        background: #4B708A; 
+        color: #fff; 
+        border: none; 
+        border-radius: 4px; 
+        padding: 0.5em 1em; 
+        cursor: pointer; 
+        margin-right: 0.5em; 
+        font-size: 0.97em;
+        transition: all 0.2s;
+    }
+
+    .admin-action-btn:hover {
+        background: #3c5a6f;
+    }
+
+    .admin-action-btn.closed { 
+        background: #aaa;
+    }
+
+    .admin-quick-actions {
+        display: flex;
+        gap: 1em;
+        align-items: center;
+        margin-bottom: 1em;
+        flex-wrap: wrap;
+    }
+
+    .admin-search {
+        flex: 1;
+        min-width: 200px;
+        padding: 0.5em;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 0.95em;
+    }
+
+    .admin-select {
+        padding: 0.5em;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 0.95em;
+        background: white;
+    }
+
+    .admin-date {
+        padding: 0.5em;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 0.95em;
+    }
+
+    /* Estado de facturas */
+    .badge {
+        padding: 0.3em 0.6em;
+        border-radius: 3px;
+        font-size: 0.85em;
+        font-weight: 500;
+    }
+
+    .badge.pendiente {
+        background: #ffeeba;
+        color: #856404;
+    }
+
+    .badge.pagada {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .badge.cancelada {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    /* Formularios flotantes */
+    .form-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 20px;
+    }
+
+    .admin-form {
+        background: white;
+        padding: 2em;
+        border-radius: 8px;
+        width: 100%;
+        max-width: 600px;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1em;
+        margin-bottom: 1em;
+    }
+
+    .factura-items {
+        margin: 1em 0;
+        padding: 1em;
+        background: #f8f9fa;
+        border-radius: 4px;
+        border: 1px solid #eee;
+    }
+
+    .factura-item-row {
+        display: grid;
+        grid-template-columns: 2fr 100px 120px 120px 40px;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .remove-item {
+        background: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        line-height: 25px;
+        text-align: center;
+        cursor: pointer;
+        padding: 0;
+    }
+
+    .factura-summary {
+        background: #f8f9fa;
+        padding: 1em;
+        border-radius: 4px;
+        margin-top: 1em;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5em 0;
+    }
+
+    .summary-row.total {
+        border-top: 2px solid #ddd;
+        margin-top: 0.5em;
+        padding-top: 0.5em;
+        font-weight: bold;
+        font-size: 1.1em;
+    }
+
+    @media (max-width: 768px) {
+        .admin-quick-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .factura-item-row {
+            grid-template-columns: 1fr;
+            gap: 5px;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+    }
   </style>
   </section>
 
@@ -785,19 +1079,11 @@
     }
   </style>
 
+  <script src="admin.js"></script>
   <script>
-  // --- LOGIN Y PORTAL ADMIN ---
-  const ADMIN_USER = 'admin@ortizmuebles.com';
-  const ADMIN_PASS = 'admin2025';
-  let adminLogged = false;
-
-  function showAdminPortal() {
-    document.getElementById('login-card').style.display = 'none';
-    document.getElementById('admin-portal').style.display = 'block';
-    adminLogged = true;
-    loadAdminTab('refaccion');
-  }
-  function hideAdminPortal() {
+    // Constantes de autenticación
+    const ADMIN_USER = 'admin@ortizmuebles.com';
+    const ADMIN_PASS = 'admin2025';
     document.getElementById('login-card').style.display = '';
     document.getElementById('admin-portal').style.display = 'none';
     adminLogged = false;

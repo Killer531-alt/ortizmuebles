@@ -1,0 +1,204 @@
+  <section id="admin" class="admin-section hidden-admin">
+    <div class="container">
+      <h2>Panel Administrativo</h2>
+      <p class="section-desc">Gestiona inventario, facturación y pedidos desde un solo lugar.</p>
+
+      <div class="admin-tabs">
+        <button class="admin-tab active" data-tab="inventario">Inventario</button>
+        <button class="admin-tab" data-tab="facturacion">Facturación</button>
+        <button class="admin-tab" data-tab="pedidos">Pedidos</button>
+      </div>
+
+      <!-- Panel de Inventario -->
+      <div id="inventario-panel" class="admin-panel" style="display:block;">
+        <div class="admin-quick-actions">
+          <button id="btn-nuevo-material" class="admin-action-btn">+ Nuevo Material</button>
+          <button id="btn-bajos-stock" class="admin-action-btn">Ver Bajos en Stock</button>
+          <input type="text" id="buscar-inventario" placeholder="Buscar en inventario..." class="admin-search">
+        </div>
+
+        <div class="admin-table-container">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Material</th>
+                <th>Categoría</th>
+                <th>Stock</th>
+                <th>Precio</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="inventario-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Panel de Facturación -->
+      <div id="facturacion-panel" class="admin-panel" style="display:none;">
+        <div class="admin-quick-actions">
+          <button id="btn-nueva-factura" class="admin-action-btn">+ Nueva Factura</button>
+          <input type="date" id="fecha-factura" class="admin-date">
+          <select id="filtro-estado" class="admin-select">
+            <option value="">Todos los estados</option>
+            <option value="pendiente">Pendientes</option>
+            <option value="pagada">Pagadas</option>
+            <option value="cancelada">Canceladas</option>
+          </select>
+        </div>
+
+        <div class="admin-table-container">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Factura #</th>
+                <th>Cliente</th>
+                <th>Fecha</th>
+                <th>Total</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="factura-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Panel de Pedidos -->
+      <div id="pedidos-panel" class="admin-panel" style="display:none;">
+        <div class="admin-quick-actions">
+          <button id="btn-actualizar-pedidos" class="admin-action-btn">↻ Actualizar</button>
+          <select id="filtro-pedidos" class="admin-select">
+            <option value="">Todos los pedidos</option>
+            <option value="pendiente">Pendientes</option>
+            <option value="proceso">En Proceso</option>
+            <option value="completado">Completados</option>
+          </select>
+        </div>
+
+        <div class="admin-table-container">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Pedido #</th>
+                <th>Cliente</th>
+                <th>Producto</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="pedidos-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Overlays de Formularios -->
+  
+  <!-- Formulario de Nuevo Material -->
+  <div id="form-overlay" class="form-overlay">
+    <form id="inventario-form" class="admin-form">
+      <h3>Nuevo Material</h3>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="inv_nombre">Nombre *</label>
+          <input type="text" id="inv_nombre" name="nombre" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="inv_categoria">Categoría *</label>
+          <select id="inv_categoria" name="categoria" required>
+            <option value="">Seleccionar</option>
+            <option value="madera">Madera</option>
+            <option value="tela">Tela</option>
+            <option value="espuma">Espuma</option>
+            <option value="herrajes">Herrajes</option>
+            <option value="pintura">Pintura</option>
+            <option value="producto">Producto Final</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="inv_cantidad">Cantidad *</label>
+          <input type="number" id="inv_cantidad" name="cantidad" min="0" step="1" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="inv_unidad">Unidad</label>
+          <select id="inv_unidad" name="unidad">
+            <option value="unidades">Unidades</option>
+            <option value="metros">Metros</option>
+            <option value="kilos">Kilos</option>
+            <option value="piezas">Piezas</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="inv_precio">Precio (opcional)</label>
+          <input type="number" id="inv_precio" name="precio" min="0">
+        </div>
+        
+        <div class="form-group">
+          <label for="inv_minimo">Stock Mínimo</label>
+          <input type="number" id="inv_minimo" name="minimo" min="0" value="5">
+        </div>
+      </div>
+      
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" onclick="hideFormOverlay('form-overlay')">Cancelar</button>
+        <button type="submit" class="btn">Guardar Material</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Formulario de Nueva Factura -->
+  <div id="factura-form-overlay" class="form-overlay">
+    <form id="factura-form" class="admin-form">
+      <h3>Nueva Factura</h3>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fact_cliente">Cliente *</label>
+          <input type="text" id="fact_cliente" name="cliente" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="fact_fecha">Fecha *</label>
+          <input type="date" id="fact_fecha" name="fecha" required>
+        </div>
+      </div>
+
+      <div class="factura-items">
+        <h4>Items</h4>
+        <div id="items-container">
+          <!-- Los items se agregarán dinámicamente aquí -->
+        </div>
+        <button type="button" id="add-item" class="admin-action-btn">+ Agregar Item</button>
+      </div>
+
+      <div class="factura-summary">
+        <div class="summary-row">
+          <span>Subtotal:</span>
+          <span id="subtotal">$0</span>
+        </div>
+        <div class="summary-row">
+          <span>IVA (19%):</span>
+          <span id="iva">$0</span>
+        </div>
+        <div class="summary-row total">
+          <span>Total:</span>
+          <span id="total">$0</span>
+        </div>
+      </div>
+      
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" onclick="hideFormOverlay('factura-form-overlay')">Cancelar</button>
+        <button type="submit" class="btn">Crear Factura</button>
+      </div>
+    </form>
+  </div>

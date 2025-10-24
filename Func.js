@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // LÓGICA DE ESTADO DE AUTENTICACIÓN
     // ===========================================
     let isLoggedIn = false; // Estado inicial: NO logueado
+    const API_BASE = 'https://sofasback.onrender.com/api';
 
     const loginAlert = document.getElementById('login-alert');
     const adminElements = document.querySelectorAll('.hidden-admin');
@@ -45,18 +46,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Verificar si hay token guardado al cargar
+    // Verificar autenticación y actualizar UI
     const savedToken = localStorage.getItem('authToken');
     if (savedToken) {
         isLoggedIn = true;
         const loginButton = document.getElementById('login-button');
         if (loginButton) {
-            loginButton.textContent = 'Bienvenido(a)';
+            loginButton.textContent = 'Panel Admin';
             loginButton.style.backgroundColor = '#556B2F';
-            loginButton.style.pointerEvents = 'none';
         }
         updateAdminVisibility();
-        fetchInventario();
-        fetchFacturas();
+        
+        // Cargar datos admin
+        Promise.all([
+            fetchInventario(),
+            fetchFacturas(),
+            fetchPedidos()
+        ]).catch(err => console.error('Error cargando datos:', err));
     }
 
     // Añadir token a las llamadas fetch si existe
@@ -71,19 +77,148 @@ document.addEventListener('DOMContentLoaded', () => {
         return fetch(url, options);
     }
 
-    // --- FORMULARIOS ---
+// --- FUNCIONES DE INVENTARIO ---
+    async function fetchInventario() {
+        try {
+            const res = await fetchWithAuth(`${API_BASE}/inventario`);
+            if (!res.ok) throw new Error('Error al obtener inventario');
+            const items = await res.json();
+            renderInventarioTable(items);
+        } catch (err) {
+            console.error('Error:', err);
+            alert('Error al cargar inventario');
+        }
+    }
+
+    function renderInventarioTable(items) {
+        const tbody = document.getElementById('inventario-table-body');
+        if (!tbody) return;
+        
+        tbody.innerHTML = items.map(item => `
+            <tr>
+                <td>${item.nombre}</td>
+                <td>${item.categoria}</td>
+                <td>${item.cantidad} ${item.unidad || 'unidades'}</td>
+                <td>$${item.precio?.toLocaleString()}</td>
+                <td>
+                    <button class="admin-action-btn" data-id="${item._id}" data-action="edit">
+                        ✏️
+                    </button>
+                    <button class="admin-action-btn" data-id="${item._id}" data-action="delete" style="background:#dc3545">
+                        🗑️
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    // Evento para nuevo material
+    const btnNuevoMaterial = document.getElementById('btn-nuevo-material');
+    if (btnNuevoMaterial) {
+        btnNuevoMaterial.addEventListener('click', () => {
+            const formOverlay = document.getElementById('form-overlay');
+            const inventarioForm = document.getElementById('inventario-form');
+            if (formOverlay && inventarioForm) {
+                formOverlay.style.display = 'flex';
+                inventarioForm.reset();
+            }
+        });
+    }
+
+    // Cerrar overlay al hacer clic fuera del formulario
+    const formOverlay = document.getElementById('form-overlay');
+    if (formOverlay) {
+        formOverlay.addEventListener('click', (e) => {
+            if (e.target === formOverlay) {
+                formOverlay.style.display = 'none';
+            }
+        });
+    }
+
+    // Manejo del formulario de inventario
+    const inventarioForm = document.getElementById('inventario-form');
+    if (inventarioForm) {
+        inventarioForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(inventarioForm);
+            const data = Object.fromEntries(formData);
+            
+            try {
+                const res = await fetchWithAuth(`${API_BASE}/inventario`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if (!res.ok) throw new Error('Error al crear material');
+                
+                formOverlay.style.display = 'none';
+                inventarioForm.reset();
+                fetchInventario();
+                alert('Material creado exitosamente');
+            } catch (err) {
+                console.error('Error:', err);
+                alert('Error al crear material');
+            }
+        });
+    }
+
+    // --- FUNCIONES DE FACTURACIÓN ---
+    async function fetchFacturas() {
+        try {
+            const res = await fetchWithAuth(`${API_BASE}/factura`);
+            if (!res.ok) throw new Error('Error al obtener facturas');
+            const facturas = await res.json();
+            renderFacturasTable(facturas);
+        } catch (err) {
+            console.error('Error:', err);
+            alert('Error al cargar facturas');
+        }
+    }
+
+    function renderFacturasTable(facturas) {
+        const tbody = document.getElementById('factura-table-body');
+        if (!tbody) return;
+        
+        tbody.innerHTML = facturas.map(factura => `
+            <tr>
+                <td>#${factura._id.slice(-6)}</td>
+                <td>${factura.cliente}</td>
+                <td>${new Date(factura.fecha).toLocaleDateString()}</td>
+                <td>$${factura.total?.toLocaleString()}</td>
+                <td><span class="badge ${factura.estado}">${factura.estado}</span></td>
+                <td>
+                    <button class="admin-action-btn" data-id="${factura._id}" data-action="view">👁️</button>
+                    <button class="admin-action-btn" data-id="${factura._id}" data-action="pdf">📄</button>
+                    ${factura.estado === 'pendiente' ? `
+                        <button class="admin-action-btn" data-id="${factura._id}" data-action="estado">✓</button>
+                        <button class="admin-action-btn" data-id="${factura._id}" data-action="delete" style="background:#dc3545">🗑️</button>
+                    ` : ''}
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    // Evento para nueva factura
+    const btnNuevaFactura = document.getElementById('btn-nueva-factura');
+    if (btnNuevaFactura) {
+        btnNuevaFactura.addEventListener('click', () => {
+            const formOverlay = document.getElementById('factura-form-overlay');
+            const facturaForm = document.getElementById('factura-form');
+            if (formOverlay && facturaForm) {
+                formOverlay.style.display = 'flex';
+                facturaForm.reset();
+            }
+        });
+    }
+
+    // --- Formularios ---
 
     // 1. CITA DIRECTA (DISEÑO DESDE CERO) - PERMITE INVITADOS
     if (citaForm) {
         citaForm.addEventListener('submit', function(event) {
             event.preventDefault(); 
-            
-            // ✅ ACEPTA INVITADOS: Se eliminó la validación de login.
-            
             alert('¡Solicitud de Cita Enviada! Gracias. El dueño se contactará directamente contigo...');
-            // *** PUNTO DE CONEXIÓN AL BACKEND (Cloud Function) ***
-            // Aquí se debe implementar la llamada fetch a: POST /api/solicitar-cita
-            
             citaForm.reset();
         });
     }
