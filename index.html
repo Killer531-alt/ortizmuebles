@@ -426,11 +426,38 @@
             <button class="btn admin-tab" data-tab="refaccion">Refacciones</button>
             <button class="btn admin-tab" data-tab="cita">Citas</button>
             <button class="btn admin-tab" data-tab="personalizacion">Personalizaciones</button>
+            <button class="btn admin-tab" data-tab="inventario">Inventario</button>
+            <button class="btn admin-tab" data-tab="facturacion">Facturación</button>
           </div>
           <div id="admin-content">
             <div id="admin-refaccion" class="admin-table-container" style="display:none"></div>
             <div id="admin-cita" class="admin-table-container" style="display:none"></div>
             <div id="admin-personalizacion" class="admin-table-container" style="display:none"></div>
+            <div id="inventario-panel" class="admin-panel" style="display:none">
+              <div class="admin-quick-actions">
+                <button id="btn-nuevo-material" class="admin-action-btn">+ Nuevo Material</button>
+                <input type="text" id="buscar-inventario" placeholder="Buscar en inventario..." class="admin-search">
+              </div>
+              <div class="admin-table-container">
+                <table class="admin-table">
+                  <thead><tr><th>Material</th><th>Categoría</th><th>Stock</th><th>Precio</th><th>Acciones</th></tr></thead>
+                  <tbody id="inventario-table-body"></tbody>
+                </table>
+              </div>
+            </div>
+            <div id="facturacion-panel" class="admin-panel" style="display:none">
+              <div class="admin-quick-actions">
+                <button id="btn-nueva-factura" class="admin-action-btn">+ Nueva Factura</button>
+                <input type="date" id="fecha-factura" class="admin-date">
+                <select id="filtro-estado" class="admin-select"><option value="">Todos</option><option value="pendiente">Pendientes</option><option value="pagada">Pagadas</option><option value="cancelada">Canceladas</option></select>
+              </div>
+              <div class="admin-table-container">
+                <table class="admin-table">
+                  <thead><tr><th>Factura #</th><th>Cliente</th><th>Fecha</th><th>Total</th><th>Estado</th><th>Acciones</th></tr></thead>
+                  <tbody id="factura-table-body"></tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -509,6 +536,8 @@
   const ADMIN_USER = 'admin@ortizmuebles.com';
   const ADMIN_PASS = 'admin2025';
   let adminLogged = false;
+  // API base para llamadas admin y Func.js
+  const API_BASE = 'https://sofasback.onrender.com/api';
 
   function showAdminPortal() {
     document.getElementById('login-card').style.display = 'none';
@@ -560,8 +589,13 @@
   function loadAdminTab(tab) {
     document.querySelectorAll('.admin-tab').forEach(btn => btn.classList.remove('active'));
     document.querySelector(`.admin-tab[data-tab="${tab}"]`).classList.add('active');
-    document.querySelectorAll('.admin-table-container').forEach(div => div.style.display = 'none');
-    document.getElementById(`admin-${tab}`).style.display = 'block';
+    // ocultar contenedores antiguos y nuevos
+    document.querySelectorAll('.admin-table-container, .admin-panel').forEach(div => div.style.display = 'none');
+    // soportar dos convenciones: 'admin-<tab>' (antiguo) o '<tab>-panel' (nuevo)
+    const panelOld = document.getElementById(`admin-${tab}`);
+    const panelNew = document.getElementById(`${tab}-panel`);
+    const panel = panelOld || panelNew;
+    if (panel) panel.style.display = 'block';
     loadAdminData(tab);
   }
   // Cargar datos de backend y renderizar tablas
@@ -570,17 +604,45 @@
     if (tab === 'refaccion') url = `${API_BASE}/refaccion`;
     if (tab === 'cita') url = `${API_BASE}/cita`;
     if (tab === 'personalizacion') url = `${API_BASE}/personalizacion`;
-    const container = document.getElementById(`admin-${tab}`);
+    if (tab === 'inventario') url = `${API_BASE}/inventario`;
+    if (tab === 'facturacion') url = `${API_BASE}/factura`;
+    const container = document.getElementById(`admin-${tab}`) || document.getElementById(`${tab}-panel`);
+    if (!container) return;
     container.innerHTML = 'Cargando...';
     try {
       const res = await fetch(url);
       const data = await res.json();
-      container.innerHTML = renderAdminTable(tab, data);
-      // Botones de acción
+      // Caso inventario: renderizar tabla simplificada con botones que Func.js leerá
+      if (tab === 'inventario') {
+        if (!Array.isArray(data) || data.length === 0) {
+          container.innerHTML = '<p>No hay materiales.</p>';
+        } else {
+          let html = '<table class="admin-table"><thead><tr><th>Nombre</th><th>Categoría</th><th>Cantidad</th><th>Precio</th><th>Acciones</th></tr></thead><tbody>';
+          data.forEach(it => {
+            html += `<tr><td>${it.nombre}</td><td>${it.categoria||''}</td><td>${it.cantidad||0}</td><td>${it.precio||''}</td><td><button class='admin-action-btn' data-id='${it._id}' data-action='edit'>✏️</button> <button class='admin-action-btn' data-id='${it._id}' data-action='delete' style='background:#dc3545'>🗑️</button></td></tr>`;
+          });
+          html += '</tbody></table>';
+          container.innerHTML = html;
+        }
+      } else if (tab === 'facturacion') {
+        if (!Array.isArray(data) || data.length === 0) {
+          container.innerHTML = '<p>No hay facturas.</p>';
+        } else {
+          let html = '<table class="admin-table"><thead><tr><th>#</th><th>Cliente</th><th>Fecha</th><th>Total</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>';
+          data.forEach(f => {
+            html += `<tr><td>#${f._id.slice(-6)}</td><td>${f.cliente||''}</td><td>${(f.fecha||'').slice(0,10)}</td><td>${f.total||''}</td><td>${f.estado||''}</td><td><button class='admin-action-btn' data-id='${f._id}' data-action='view-f'>👁️</button> <button class='admin-action-btn' data-id='${f._id}' data-action='pdf-f'>📄</button></td></tr>`;
+          });
+          html += '</tbody></table>';
+          container.innerHTML = html;
+        }
+      } else {
+        container.innerHTML = renderAdminTable(tab, data);
+      }
+      // Añadir listeners visuales a botones (la lógica real de acción está en Func.js mediante delegación)
       container.querySelectorAll('.admin-action-btn').forEach(btn => {
         btn.addEventListener('click', function() {
+          // sólo visual toggle para botones antiguos
           this.classList.toggle('closed');
-          this.textContent = this.classList.contains('closed') ? 'Cerrado' : 'Cerrar';
         });
       });
     } catch (err) {
@@ -721,6 +783,85 @@
     <p>&copy; 2025 Orlando Ortiz Muebles - Diseño Artesanal - Todos los derechos reservados</p>
   </footer>
   
+  <!-- Overlays de Formularios (Inventario / Facturación) -->
+  <div id="form-overlay" class="form-overlay" style="display:none;">
+    <form id="inventario-form" class="admin-form">
+      <h3>Nuevo Material</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="inv_nombre">Nombre *</label>
+          <input type="text" id="inv_nombre" name="nombre" required>
+        </div>
+        <div class="form-group">
+          <label for="inv_categoria">Categoría *</label>
+          <select id="inv_categoria" name="categoria" required>
+            <option value="">Seleccionar</option>
+            <option value="madera">Madera</option>
+            <option value="tela">Tela</option>
+            <option value="espuma">Espuma</option>
+            <option value="herrajes">Herrajes</option>
+            <option value="pintura">Pintura</option>
+            <option value="producto">Producto Final</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="inv_cantidad">Cantidad *</label>
+          <input type="number" id="inv_cantidad" name="cantidad" min="0" step="1" required>
+        </div>
+        <div class="form-group">
+          <label for="inv_unidad">Unidad</label>
+          <select id="inv_unidad" name="unidad">
+            <option value="unidades">Unidades</option>
+            <option value="metros">Metros</option>
+            <option value="kilos">Kilos</option>
+            <option value="piezas">Piezas</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="inv_precio">Precio (opcional)</label>
+          <input type="number" id="inv_precio" name="precio" min="0">
+        </div>
+        <div class="form-group">
+          <label for="inv_minimo">Stock Mínimo</label>
+          <input type="number" id="inv_minimo" name="minimo" min="0" value="5">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" onclick="hideFormOverlay('form-overlay')">Cancelar</button>
+        <button type="submit" class="btn">Guardar Material</button>
+      </div>
+    </form>
+  </div>
+
+  <div id="factura-form-overlay" class="form-overlay" style="display:none;">
+    <form id="factura-form" class="admin-form">
+      <h3>Nueva Factura</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fact_cliente">Cliente *</label>
+          <input type="text" id="fact_cliente" name="cliente" required>
+        </div>
+        <div class="form-group">
+          <label for="fact_fecha">Fecha *</label>
+          <input type="date" id="fact_fecha" name="fecha" required>
+        </div>
+      </div>
+      <div class="factura-items">
+        <h4>Items</h4>
+        <div id="items-container"></div>
+        <button type="button" id="add-item" class="admin-action-btn">+ Agregar Item</button>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" onclick="hideFormOverlay('factura-form-overlay')">Cancelar</button>
+        <button type="submit" class="btn">Crear Factura</button>
+      </div>
+    </form>
+  </div>
+
   <div id="product-modal" class="modal">
     <div class="modal-content">
         <span class="close-btn">&times;</span>
@@ -756,11 +897,11 @@
     </div>
   </div>
   
+  <script src="admin.js"></script>
   <script src="Func.js"></script>
   <script>
   // --- INTEGRACIÓN BACKEND FORMULARIOS ---
-  // Cambia esta URL si tu backend está en otro puerto o dominio
-  const API_BASE = 'https://sofasback.onrender.com/api';
+  // API base ya está definida más arriba en el script de administración
 
   // Refacción
   document.getElementById('refaccion-form').addEventListener('submit', async function(e) {

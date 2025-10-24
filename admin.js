@@ -152,6 +152,97 @@ function setupEventListeners() {
     setupSearchFilters();
 }
 
+// Setup handlers for forms (inventario/factura)
+function setupLoginForm() {
+    // index.html already has a simple login handler; keep this as a safety no-op fallback
+    const form = document.getElementById('login-form');
+    if (!form) return;
+    // If there is a login flow here, don't override existing behavior
+}
+
+function setupInventarioForm() {
+    const invForm = document.getElementById('inventario-form');
+    if (!invForm) return;
+    invForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const payload = {
+            nombre: document.getElementById('inv_nombre').value,
+            categoria: document.getElementById('inv_categoria').value,
+            cantidad: Number(document.getElementById('inv_cantidad').value) || 0,
+            unidad: document.getElementById('inv_unidad') ? document.getElementById('inv_unidad').value : 'unidades',
+            precio: Number(document.getElementById('inv_precio').value) || 0,
+            minimo: Number(document.getElementById('inv_minimo').value) || 0
+        };
+        const editId = invForm.dataset.editId;
+        try {
+            const url = editId ? `${API_BASE}/inventario/${editId}` : `${API_BASE}/inventario`;
+            const method = editId ? 'PUT' : 'POST';
+            const res = await fetchWithAuth(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            await handleFetchError(res);
+            hideFormOverlay('form-overlay');
+            invForm.removeAttribute('data-edit-id');
+            fetchInventario();
+        } catch (err) {
+            alert('Error guardando material: ' + err.message);
+        }
+    });
+}
+
+function setupFacturaForm() {
+    const facturaForm = document.getElementById('factura-form');
+    const addBtn = document.getElementById('add-item');
+    const itemsContainer = document.getElementById('items-container');
+    if (addBtn && itemsContainer) {
+        addBtn.addEventListener('click', async () => {
+            try {
+                const res = await fetchWithAuth(`${API_BASE}/inventario`);
+                const items = await handleFetchError(res);
+                const row = document.createElement('div');
+                row.className = 'fact-item-row';
+                row.innerHTML = `
+                    <select class="fact-prod">
+                        ${items.map(it => `<option value="${it._id}">${it.nombre} (${it.cantidad})</option>`).join('')}
+                    </select>
+                    <input type="number" class="fact-qty" min="1" value="1" />
+                    <button type="button" class="remove-item-btn">✖</button>
+                `;
+                itemsContainer.appendChild(row);
+                row.querySelector('.remove-item-btn').addEventListener('click', () => row.remove());
+            } catch (err) {
+                alert('Error cargando productos: ' + err.message);
+            }
+        });
+    }
+    if (!facturaForm) return;
+    facturaForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const cliente = document.getElementById('fact_cliente').value;
+        const fecha = document.getElementById('fact_fecha').value;
+        const rows = Array.from(document.querySelectorAll('#items-container .fact-item-row'));
+        const items = rows.map(r => ({ producto: r.querySelector('.fact-prod').value, cantidad: Number(r.querySelector('.fact-qty').value) || 1 }));
+        try {
+            const res = await fetchWithAuth(`${API_BASE}/factura`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ cliente, fecha, items }) });
+            await handleFetchError(res);
+            hideFormOverlay('factura-form-overlay');
+            // limpiar items
+            itemsContainer.innerHTML = '';
+            facturaForm.reset();
+            fetchFacturas();
+        } catch (err) {
+            alert('Error creando factura: ' + err.message);
+        }
+    });
+}
+
+function setupSearchFilters() {
+    const buscar = document.getElementById('buscar-inventario');
+    if (!buscar) return;
+    buscar.addEventListener('input', () => {
+        // Simplemente refrescar inventario; renderInventarioTable puede aplicar filtro si se desea
+        fetchInventario();
+    });
+}
+
 // === FUNCIONES DE API ===
 
 // Fetch con autenticación
