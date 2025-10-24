@@ -368,6 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const res = await fetch(`${API_BASE}/inventario`);
             const data = await handleFetchError(res);
+            inventarioCache = data; // Actualizar cache
             renderInventario(data);
         } catch (err) {
             alert('Error al obtener inventario: ' + err.message);
@@ -384,10 +385,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${item.categoria || ''}</td>
                 <td>${item.cantidad ?? 0}</td>
                 <td>${item.punto_reorden ?? 0}</td>
-                <td>${item.precio ?? ''}</td>
+                <td>${formatPrice(item.precio) ?? ''}</td>
                 <td>
                     <button class="admin-action-btn" data-action="edit" data-id="${item._id}">Editar</button>
                     <button class="admin-action-btn" data-action="delete" data-id="${item._id}">Eliminar</button>
+                    <button class="admin-action-btn" data-action="facturar" data-id="${item._id}">Facturar</button>
                 </td>
             `;
             invTableBody.appendChild(tr);
@@ -429,7 +431,19 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!btn) return;
             const id = btn.dataset.id;
             const action = btn.dataset.action;
-            if (action === 'delete') {
+            
+            if (action === 'facturar') {
+                // Cambiar a la pestaña de facturación
+                document.querySelector('[data-tab="facturacion"]').click();
+                // Buscar el producto en cache
+                const producto = inventarioCache.find(p => p._id === id);
+                if (producto) {
+                    // Añadir item pre-llenado
+                    addFacturaItem(producto);
+                    // Scroll al formulario
+                    facturaForm.scrollIntoView({ behavior: 'smooth' });
+                }
+            } else if (action === 'delete') {
                 if (!confirm('Eliminar material del inventario?')) return;
                 try {
                     const res = await fetch(`${API_BASE}/inventario/${id}`, { method: 'DELETE' });
@@ -501,6 +515,81 @@ document.addEventListener('DOMContentLoaded', () => {
     const facturaTableBody = document.querySelector('#factura-table tbody');
     const facturaForm = document.getElementById('factura-form');
     const refreshFacturasBtn = document.getElementById('refresh-facturas');
+    const addItemBtn = document.getElementById('add-item-btn');
+    const itemsContainer = document.getElementById('items-container');
+    const itemTemplate = document.getElementById('item-template');
+
+    // Mantener cache del inventario para selector de productos
+    let inventarioCache = [];
+    
+    function formatPrice(amount) {
+        return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(amount);
+    }
+
+    // Actualizar totales de la factura
+    function updateFacturaTotales() {
+        let subtotal = 0;
+        document.querySelectorAll('.factura-item').forEach(item => {
+            const total = Number(item.querySelector('.item-total').value) || 0;
+            subtotal += total;
+        });
+        const iva = subtotal * 0.19;
+        const total = subtotal + iva;
+
+        document.getElementById('factura-subtotal').textContent = formatPrice(subtotal);
+        document.getElementById('factura-iva').textContent = formatPrice(iva);
+        document.getElementById('factura-total').textContent = formatPrice(total);
+    }
+
+    // Manejar cambios en items de factura
+    function handleItemChange(itemElement) {
+        const productoSelect = itemElement.querySelector('.item-producto');
+        const cantidadInput = itemElement.querySelector('.item-cantidad');
+        const precioInput = itemElement.querySelector('.item-precio');
+        const totalInput = itemElement.querySelector('.item-total');
+
+        const producto = inventarioCache.find(p => p._id === productoSelect.value);
+        if (producto) {
+            precioInput.value = producto.precio || 0;
+            const cantidad = Number(cantidadInput.value) || 0;
+            totalInput.value = (producto.precio || 0) * cantidad;
+            updateFacturaTotales();
+        }
+    }
+
+    // Agregar nuevo item a la factura
+    function addFacturaItem(producto = null) {
+        const itemElement = itemTemplate.content.cloneNode(true).children[0];
+        const select = itemElement.querySelector('.item-producto');
+        
+        // Llenar selector con inventario
+        inventarioCache.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item._id;
+            option.textContent = `${item.nombre} (Stock: ${item.cantidad})`;
+            select.appendChild(option);
+        });
+
+        // Si se pasó un producto, seleccionarlo
+        if (producto) {
+            select.value = producto._id;
+        }
+
+        // Event listeners
+        select.addEventListener('change', () => handleItemChange(itemElement));
+        itemElement.querySelector('.item-cantidad').addEventListener('input', () => handleItemChange(itemElement));
+        itemElement.querySelector('.remove-item-btn').addEventListener('click', () => {
+            itemElement.remove();
+            updateFacturaTotales();
+        });
+
+        itemsContainer.appendChild(itemElement);
+        handleItemChange(itemElement);
+    }
+
+    if (addItemBtn) {
+        addItemBtn.addEventListener('click', () => addFacturaItem());
+    }
 
     async function fetchFacturas() {
         try {
@@ -546,16 +635,26 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const payload = {
                 cliente: document.getElementById('fac_cliente').value,
+                telefono: document.getElementById('fac_telefono').value,
+                email: document.getElementById('fac_email').value,
+                direccion: document.getElementById('fac_direccion').value,
                 items: []
             };
-            const itemsText = document.getElementById('fac_items').value.trim();
-            if (itemsText) {
-                try {
-                    payload.items = JSON.parse(itemsText);
-                } catch (err) {
-                    alert('Items JSON inválido: ' + err.message);
-                    return;
+
+            // Recolectar items del formulario
+            document.querySelectorAll('.factura-item').forEach(item => {
+                const producto = item.querySelector('.item-producto').value;
+                const cantidad = Number(item.querySelector('.item-cantidad').value);
+                const precio = Number(item.querySelector('.item-precio').value);
+                
+                if (producto && cantidad && precio) {
+                    payload.items.push({ producto, cantidad, precio });
                 }
+            });
+
+            if (!payload.items.length) {
+                alert('Agrega al menos un item a la factura');
+                return;
             }
             try {
                 const res = await fetch(`${API_BASE}/factura`, {
