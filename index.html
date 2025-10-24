@@ -616,7 +616,22 @@
 
   <section id="auth" class="auth-section">
       <div class="container">
-        <h2>Registro e Inicio de Sesión</h2>
+        <h2>Iniciar Sesión</h2>
+        <div class="auth-form-container">
+          <form id="login-form" class="auth-form">
+            <div class="form-group">
+              <label for="login_email">Email *</label>
+              <input type="email" id="login_email" required>
+            </div>
+            <div class="form-group">
+              <label for="login_password">Contraseña *</label>
+              <input type="password" id="login_password" required>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="admin-action-btn">Iniciar Sesión</button>
+            </div>
+          </form>
+        </div>
         <p class="section-desc">Crea tu cuenta para guardar tus pedidos y contactarte con nuestro equipo.</p>
         <div class="login-form-card" id="login-card">
           <h3>Iniciar Sesión</h3>

@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const registroForm = document.getElementById('registro-form');
     const loginForm = document.getElementById('login-form');
 
-    // Función de validación de LOGIN
+    // Función de validación de LOGIN y manejo de token
     function validateLogin(event) {
         if (!isLoggedIn) {
             event.preventDefault(); 
@@ -42,6 +42,33 @@ document.addEventListener('DOMContentLoaded', () => {
             return false;
         }
         return true;
+    }
+
+    // Verificar si hay token guardado al cargar
+    const savedToken = localStorage.getItem('authToken');
+    if (savedToken) {
+        isLoggedIn = true;
+        const loginButton = document.getElementById('login-button');
+        if (loginButton) {
+            loginButton.textContent = 'Bienvenido(a)';
+            loginButton.style.backgroundColor = '#556B2F';
+            loginButton.style.pointerEvents = 'none';
+        }
+        updateAdminVisibility();
+        fetchInventario();
+        fetchFacturas();
+    }
+
+    // Añadir token a las llamadas fetch si existe
+    async function fetchWithAuth(url, options = {}) {
+        const token = localStorage.getItem('authToken');
+        if (token) {
+            options.headers = {
+                ...options.headers,
+                'Authorization': `Bearer ${token}`
+            };
+        }
+        return fetch(url, options);
     }
 
     // --- FORMULARIOS ---
@@ -90,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Lógica de Login/Registro (Solo simulación de estado para el frontend)
+    // Lógica de Login/Registro 
     if (loginForm) {
         loginForm.addEventListener('submit', function(event) {
             event.preventDefault(); 
@@ -351,7 +378,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ===========================================
 
     // Cambia este API_BASE si tu backend corre en otra URL/puerto
-    const API_BASE = window.API_BASE || 'http://localhost:4000/api';
+    const API_BASE = window.API_BASE || 'https://ortiz-backend-dev.onrender.com/api';
 
     // --- Helpers ---
     function handleFetchError(res) {
@@ -366,12 +393,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchInventario() {
         try {
-            const res = await fetch(`${API_BASE}/inventario`);
+            const res = await fetchWithAuth(`${API_BASE}/inventario`);
             const data = await handleFetchError(res);
             inventarioCache = data; // Actualizar cache
             renderInventario(data);
         } catch (err) {
-            alert('Error al obtener inventario: ' + err.message);
+            if (err.message.includes('401')) {
+                alert('Sesión expirada. Por favor, inicia sesión nuevamente.');
+                localStorage.removeItem('authToken');
+                isLoggedIn = false;
+                updateAdminVisibility();
+            } else {
+                alert('Error al obtener inventario: ' + err.message);
+            }
         }
     }
 
