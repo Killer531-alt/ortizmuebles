@@ -1,5 +1,4 @@
 // Constantes
-const API_BASE = 'https://sofasback.onrender.com/api';
 let isLoggedIn = false;
 
 // Al cargar la página

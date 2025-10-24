@@ -474,6 +474,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Mostrar overlay al pulsar Nuevo Material o Nueva Factura (si existen botones)
+    const btnNuevo = document.getElementById('btn-nuevo-material');
+    if (btnNuevo) btnNuevo.addEventListener('click', () => {
+        const overlay = document.getElementById('form-overlay'); if (overlay) overlay.style.display = 'flex';
+    });
+    const btnNuevaFact = document.getElementById('btn-nueva-factura');
+    if (btnNuevaFact) btnNuevaFact.addEventListener('click', () => {
+        const overlay = document.getElementById('factura-form-overlay'); if (overlay) overlay.style.display = 'flex';
+    });
+
     // Facturas: listar y crear
     async function fetchFacturas() {
         try {
