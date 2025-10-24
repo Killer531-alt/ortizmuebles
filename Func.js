@@ -377,8 +377,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // ADMIN: INTEGRACIÓN CON API (Inventario / Facturación)
     // ===========================================
 
-    // Cambia este API_BASE si tu backend corre en otra URL/puerto
-    const API_BASE = window.API_BASE || 'https://ortiz-backend-dev.onrender.com/api';
+    // URL base del backend en producción
+    const API_BASE = window.API_BASE || 'https://sofasback.onrender.com/api';
 
     // --- Helpers ---
     function handleFetchError(res) {
