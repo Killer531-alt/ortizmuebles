@@ -113,6 +113,11 @@ ENCABEZADO Y LOGIN SUPERIOR DERECHA
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
+/* Elementos admin ocultos hasta login */
+.hidden-admin {
+  display: none !important;
+}
+
 .navbar a {
   color: #4A3026; 
   margin: 0 20px;

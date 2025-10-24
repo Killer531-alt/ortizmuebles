@@ -1,0 +1,33 @@
+Notas de integración (resumen rápido):
+
+API base default usado en frontend: http://localhost:4000/api
+
+Rutas usadas:
+- Inventario
+  - GET  /api/inventario           -> listar todos
+  - GET  /api/inventario/:id       -> obtener uno
+  - POST /api/inventario           -> crear
+  - PUT  /api/inventario/:id       -> actualizar
+  - DELETE /api/inventario/:id     -> eliminar
+  - GET /api/inventario/categoria/:categoria
+  - GET /api/inventario/alerta/bajo-stock
+
+- Factura
+  - GET  /api/factura              -> listar facturas (populate items.producto)
+  - GET  /api/factura/:id          -> obtener factura
+  - POST /api/factura              -> crear (body: { ... factura, items: [{producto, cantidad, precio}, ...] })
+  - PUT  /api/factura/:id/estado   -> actualizar estado (body: { estado })
+  - DELETE /api/factura/:id        -> eliminar/cancelar
+  - GET  /api/factura/rango/:inicio/:fin
+  - GET  /api/factura/:id/pdf      -> descargar PDF
+
+Notas:
+- El backend necesita correr en http://localhost:4000 para coincidir con API_BASE por defecto.
+- CORS del backend ya incluye 'http://localhost:5500' (Live Server). Si sirves los archivos desde otra URL, añade origen a backend.
+
+Siguientes pasos sugeridos:
+1) Ejecutar el backend (node index.js) en puerto 4000 y probar endpoints con Postman o curl.
+2) Abrir `index.html` via Live Server (http://localhost:5500) y usar la pestaña Admin -> Inventario / Facturación.
+3) Para crear facturas con items, usar IDs de productos existentes (del inventario) en el textarea de items en JSON.
+
+Si quieres, puedo ahora mejorar la validación de los formularios y añadir edición en línea de inventario o manejar subida de PDF desde el frontend.

@@ -75,6 +75,7 @@
       <a href="#testimonios">Testimonios</a>
       <a href="#pedidos">Pedidos</a>
       <a href="#contacto">Contacto</a>
+      <a href="#admin" class="admin-link hidden-admin">Admin</a>
     </div>
   </nav>
 
@@ -391,6 +392,67 @@
       </form>
     </div>
 
+      </div>
+    </div>
+  </section>
+
+  <section id="admin" class="admin-section hidden-admin">
+    <div class="container">
+      <h2>Panel Administrativo</h2>
+      <p class="section-desc">Gestiona inventario y facturación desde aquí. Usa el backend local en <code>http://localhost:4000</code> por defecto o ajusta la constante <code>API_BASE</code> en <code>Func.js</code>.</p>
+
+      <div class="admin-tabs">
+        <button class="admin-tab active" data-tab="inventario">Inventario</button>
+        <button class="admin-tab" data-tab="facturacion">Facturación</button>
+      </div>
+
+      <div class="admin-table-container">
+        <div id="inventario-panel" class="admin-panel">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <h3>Inventario</h3>
+            <div>
+              <button id="refresh-inventario" class="admin-action-btn">Refrescar</button>
+            </div>
+          </div>
+
+          <form id="inventario-form" style="margin-bottom:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;">
+            <input type="text" id="inv_nombre" placeholder="Nombre" required>
+            <input type="text" id="inv_categoria" placeholder="Categoría (ej: madera, tela)">
+            <input type="number" id="inv_cantidad" placeholder="Cantidad" value="0">
+            <input type="number" id="inv_punto_reorden" placeholder="Punto de reorden" value="0">
+            <input type="number" id="inv_precio" placeholder="Precio unitario" step="0.01" value="0">
+            <button type="submit" class="admin-action-btn">Agregar</button>
+          </form>
+
+          <table class="admin-table" id="inventory-table">
+            <thead>
+              <tr><th>Nombre</th><th>Categoría</th><th>Cantidad</th><th>Punto Reorden</th><th>Precio</th><th>Acciones</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div id="facturacion-panel" class="admin-panel" style="display:none;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <h3>Facturación</h3>
+            <div>
+              <button id="refresh-facturas" class="admin-action-btn">Refrescar</button>
+            </div>
+          </div>
+
+          <form id="factura-form" style="margin-bottom:12px;display:grid;grid-template-columns:1fr;gap:10px;">
+            <input type="text" id="fac_cliente" placeholder="Nombre del cliente" required>
+            <textarea id="fac_items" placeholder='Items (JSON): [{"producto":"<id>","cantidad":1,"precio":100}, ...]' rows="3"></textarea>
+            <button type="submit" class="admin-action-btn">Crear Factura</button>
+          </form>
+
+          <table class="admin-table" id="factura-table">
+            <thead>
+              <tr><th>Número</th><th>Cliente</th><th>Fecha</th><th>Total</th><th>Estado</th><th>Acciones</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </section>

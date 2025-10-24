@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isLoggedIn = false; // Estado inicial: NO logueado
 
     const loginAlert = document.getElementById('login-alert');
+    const adminElements = document.querySelectorAll('.hidden-admin');
     
     function showLoginAlert() {
         loginAlert.classList.remove('hidden-alert');
@@ -13,6 +14,19 @@ document.addEventListener('DOMContentLoaded', () => {
             loginAlert.classList.add('hidden-alert');
         }, 4000);
     }
+
+    function updateAdminVisibility() {
+        adminElements.forEach(el => {
+            if (isLoggedIn) {
+                el.classList.remove('hidden-admin');
+            } else {
+                el.classList.add('hidden-admin');
+            }
+        });
+    }
+
+    // Ocultar elementos admin al inicio
+    updateAdminVisibility();
     
     const citaForm = document.getElementById('cita-form');
     const catalogoForm = document.getElementById('catalogo-form');
@@ -85,7 +99,10 @@ document.addEventListener('DOMContentLoaded', () => {
             loginButton.textContent = 'Bienvenido(a)';
             loginButton.style.backgroundColor = '#556B2F'; 
             loginButton.style.pointerEvents = 'none'; 
-            alert('¡Inicio de Sesión simulado exitoso! Ahora puedes enviar solicitudes críticas.');
+            updateAdminVisibility(); // Mostrar elementos admin
+            fetchInventario(); // Cargar datos iniciales
+            fetchFacturas();
+            alert('¡Inicio de Sesión simulado exitoso! Ahora puedes acceder al panel administrativo.');
             // NOTA: El login REAL debe usar una Cloud Function para autenticación
         });
     }
@@ -328,5 +345,294 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    // ===========================================
+    // ADMIN: INTEGRACIÓN CON API (Inventario / Facturación)
+    // ===========================================
+
+    // Cambia este API_BASE si tu backend corre en otra URL/puerto
+    const API_BASE = window.API_BASE || 'http://localhost:4000/api';
+
+    // --- Helpers ---
+    function handleFetchError(res) {
+        if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+        return res.json();
+    }
+
+    // --- INVENTARIO ---
+    const invTableBody = document.querySelector('#inventory-table tbody');
+    const inventarioForm = document.getElementById('inventario-form');
+    const refreshInventarioBtn = document.getElementById('refresh-inventario');
+
+    async function fetchInventario() {
+        try {
+            const res = await fetch(`${API_BASE}/inventario`);
+            const data = await handleFetchError(res);
+            renderInventario(data);
+        } catch (err) {
+            alert('Error al obtener inventario: ' + err.message);
+        }
+    }
+
+    function renderInventario(items) {
+        if (!invTableBody) return;
+        invTableBody.innerHTML = '';
+        items.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${item.nombre || ''}</td>
+                <td>${item.categoria || ''}</td>
+                <td>${item.cantidad ?? 0}</td>
+                <td>${item.punto_reorden ?? 0}</td>
+                <td>${item.precio ?? ''}</td>
+                <td>
+                    <button class="admin-action-btn" data-action="edit" data-id="${item._id}">Editar</button>
+                    <button class="admin-action-btn" data-action="delete" data-id="${item._id}">Eliminar</button>
+                </td>
+            `;
+            invTableBody.appendChild(tr);
+        });
+    }
+
+    if (refreshInventarioBtn) refreshInventarioBtn.addEventListener('click', (e) => { e.preventDefault(); fetchInventario(); });
+
+    if (inventarioForm) {
+        inventarioForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const payload = {
+                nombre: document.getElementById('inv_nombre').value,
+                categoria: document.getElementById('inv_categoria').value,
+                cantidad: Number(document.getElementById('inv_cantidad').value) || 0,
+                punto_reorden: Number(document.getElementById('inv_punto_reorden').value) || 0,
+                precio: Number(document.getElementById('inv_precio').value) || 0
+            };
+            try {
+                const res = await fetch(`${API_BASE}/inventario`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await handleFetchError(res);
+                inventarioForm.reset();
+                fetchInventario();
+                alert('Material agregado con éxito');
+            } catch (err) {
+                alert('Error al crear material: ' + err.message);
+            }
+        });
+    }
+
+    // Delegación para acciones Edit/Delete en tabla de inventario
+    if (invTableBody) {
+        invTableBody.addEventListener('click', async function(event) {
+            const btn = event.target.closest('button');
+            if (!btn) return;
+            const id = btn.dataset.id;
+            const action = btn.dataset.action;
+            if (action === 'delete') {
+                if (!confirm('Eliminar material del inventario?')) return;
+                try {
+                    const res = await fetch(`${API_BASE}/inventario/${id}`, { method: 'DELETE' });
+                    await handleFetchError(res);
+                    fetchInventario();
+                    alert('Material eliminado');
+                } catch (err) {
+                    alert('Error al eliminar: ' + err.message);
+                }
+            } else if (action === 'edit') {
+                // Para mantener simple: cargar valores en el formulario y hacer PUT al enviar
+                try {
+                    const res = await fetch(`${API_BASE}/inventario/${id}`);
+                    const material = await handleFetchError(res);
+                    document.getElementById('inv_nombre').value = material.nombre || '';
+                    document.getElementById('inv_categoria').value = material.categoria || '';
+                    document.getElementById('inv_cantidad').value = material.cantidad ?? 0;
+                    document.getElementById('inv_punto_reorden').value = material.punto_reorden ?? 0;
+                    document.getElementById('inv_precio').value = material.precio ?? 0;
+
+                    // Cambiar el comportamiento del form temporalmente
+                    const submitBtn = inventarioForm.querySelector('button[type="submit"]');
+                    const originalHandler = submitBtn.onclick;
+
+                    submitBtn.textContent = 'Guardar cambios';
+
+                    const saveHandler = async (ev) => {
+                        ev.preventDefault();
+                        const payload = {
+                            nombre: document.getElementById('inv_nombre').value,
+                            categoria: document.getElementById('inv_categoria').value,
+                            cantidad: Number(document.getElementById('inv_cantidad').value) || 0,
+                            punto_reorden: Number(document.getElementById('inv_punto_reorden').value) || 0,
+                            precio: Number(document.getElementById('inv_precio').value) || 0
+                        };
+                        try {
+                            const r = await fetch(`${API_BASE}/inventario/${id}`, {
+                                method: 'PUT',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(payload)
+                            });
+                            await handleFetchError(r);
+                            submitBtn.textContent = 'Agregar';
+                            inventarioForm.reset();
+                            // restore
+                            submitBtn.removeEventListener('click', saveHandler);
+                            fetchInventario();
+                            alert('Material actualizado');
+                        } catch (err) {
+                            alert('Error al actualizar: ' + err.message);
+                        }
+                    };
+
+                    submitBtn.addEventListener('click', saveHandler);
+
+                    // After 20s, reset the button to avoid stuck state
+                    setTimeout(() => {
+                        submitBtn.textContent = 'Agregar';
+                    }, 20000);
+
+                } catch (err) {
+                    alert('Error al cargar material: ' + err.message);
+                }
+            }
+        });
+    }
+
+    // --- FACTURACION ---
+    const facturaTableBody = document.querySelector('#factura-table tbody');
+    const facturaForm = document.getElementById('factura-form');
+    const refreshFacturasBtn = document.getElementById('refresh-facturas');
+
+    async function fetchFacturas() {
+        try {
+            const res = await fetch(`${API_BASE}/factura`);
+            const data = await handleFetchError(res);
+            renderFacturas(data);
+        } catch (err) {
+            alert('Error al obtener facturas: ' + err.message);
+        }
+    }
+
+    function computeTotal(factura) {
+        if (!factura.items) return 0;
+        return factura.items.reduce((s, it) => s + ((it.precio || 0) * (it.cantidad || 0)), 0);
+    }
+
+    function renderFacturas(items) {
+        if (!facturaTableBody) return;
+        facturaTableBody.innerHTML = '';
+        items.forEach(f => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${f.numero_factura || f._id}</td>
+                <td>${f.cliente || f.nombre_cliente || ''}</td>
+                <td>${new Date(f.fecha_emision || f.createdAt || Date.now()).toLocaleDateString()}</td>
+                <td>${computeTotal(f)}</td>
+                <td>${f.estado || 'pendiente'}</td>
+                <td>
+                    <button class="admin-action-btn" data-action="view" data-id="${f._id}">Ver</button>
+                    <button class="admin-action-btn" data-action="pdf" data-id="${f._id}">PDF</button>
+                    <button class="admin-action-btn" data-action="estado" data-id="${f._id}">Marcar Pagada</button>
+                    <button class="admin-action-btn" data-action="delete" data-id="${f._id}">Cancelar</button>
+                </td>
+            `;
+            facturaTableBody.appendChild(tr);
+        });
+    }
+
+    if (refreshFacturasBtn) refreshFacturasBtn.addEventListener('click', (e) => { e.preventDefault(); fetchFacturas(); });
+
+    if (facturaForm) {
+        facturaForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const payload = {
+                cliente: document.getElementById('fac_cliente').value,
+                items: []
+            };
+            const itemsText = document.getElementById('fac_items').value.trim();
+            if (itemsText) {
+                try {
+                    payload.items = JSON.parse(itemsText);
+                } catch (err) {
+                    alert('Items JSON inválido: ' + err.message);
+                    return;
+                }
+            }
+            try {
+                const res = await fetch(`${API_BASE}/factura`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await handleFetchError(res);
+                facturaForm.reset();
+                fetchFacturas();
+                alert('Factura creada');
+            } catch (err) {
+                alert('Error al crear factura: ' + err.message);
+            }
+        });
+    }
+
+    if (facturaTableBody) {
+        facturaTableBody.addEventListener('click', async function(event) {
+            const btn = event.target.closest('button');
+            if (!btn) return;
+            const id = btn.dataset.id;
+            const action = btn.dataset.action;
+            if (action === 'pdf') {
+                // Abrir en nueva ventana para que el navegador gestione la descarga
+                window.open(`${API_BASE}/factura/${id}/pdf`, '_blank');
+            } else if (action === 'estado') {
+                if (!confirm('Marcar factura como PAGADA?')) return;
+                try {
+                    const res = await fetch(`${API_BASE}/factura/${id}/estado`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ estado: 'pagada' })
+                    });
+                    await handleFetchError(res);
+                    fetchFacturas();
+                    alert('Factura marcada como pagada');
+                } catch (err) {
+                    alert('Error al actualizar estado: ' + err.message);
+                }
+            } else if (action === 'delete') {
+                if (!confirm('Cancelar factura? (si está pagada, se devolverá inventario)')) return;
+                try {
+                    const res = await fetch(`${API_BASE}/factura/${id}`, { method: 'DELETE' });
+                    await handleFetchError(res);
+                    fetchFacturas();
+                    alert('Factura cancelada');
+                } catch (err) {
+                    alert('Error al cancelar: ' + err.message);
+                }
+            } else if (action === 'view') {
+                try {
+                    const res = await fetch(`${API_BASE}/factura/${id}`);
+                    const factura = await handleFetchError(res);
+                    // Mostrar en modal simple
+                    alert(`Factura: ${factura._id}\nCliente: ${factura.cliente || factura.nombre_cliente}\nTotal: ${computeTotal(factura)}`);
+                } catch (err) {
+                    alert('Error al obtener factura: ' + err.message);
+                }
+            }
+        });
+    }
+
+    // --- Admin tabs ---
+    const adminTabs = document.querySelectorAll('.admin-tab');
+    adminTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            adminTabs.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            const tabName = this.dataset.tab;
+            document.getElementById('inventario-panel').style.display = (tabName === 'inventario') ? 'block' : 'none';
+            document.getElementById('facturacion-panel').style.display = (tabName === 'facturacion') ? 'block' : 'none';
+        });
+    });
+
+    // Inicializar datos en panel admin
+    fetchInventario();
+    fetchFacturas();
 
 });
