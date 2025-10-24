@@ -86,6 +86,61 @@
     </div>
   </section>
 
+  <!-- Overlays: Inventario y Facturación -->
+  <div id="form-overlay" class="form-overlay" style="display:none;">
+    <form id="inventario-form" class="admin-form">
+      <h3>Nuevo / Editar Material</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="inv_nombre">Nombre</label>
+          <input id="inv_nombre" name="nombre" required />
+        </div>
+        <div class="form-group">
+          <label for="inv_categoria">Categoría</label>
+          <input id="inv_categoria" name="categoria" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="inv_cantidad">Cantidad</label>
+          <input id="inv_cantidad" name="cantidad" type="number" min="0" />
+        </div>
+        <div class="form-group">
+          <label for="inv_precio">Precio</label>
+          <input id="inv_precio" name="precio" type="number" min="0" />
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" onclick="document.getElementById('form-overlay').style.display='none'">Cancelar</button>
+        <button type="submit" class="btn">Guardar</button>
+      </div>
+    </form>
+  </div>
+
+  <div id="factura-form-overlay" class="form-overlay" style="display:none;">
+    <form id="factura-form" class="admin-form">
+      <h3>Nueva Factura</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fact_cliente">Cliente</label>
+          <input id="fact_cliente" name="cliente" required />
+        </div>
+        <div class="form-group">
+          <label for="fact_fecha_input">Fecha</label>
+          <input id="fact_fecha_input" name="fecha" type="date" />
+        </div>
+      </div>
+      <div class="factura-items">
+        <div id="fact-items-container"></div>
+        <button type="button" id="fact-add-item" class="admin-action-btn">+ Agregar Item</button>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" onclick="document.getElementById('factura-form-overlay').style.display='none'">Cancelar</button>
+        <button type="submit" class="btn">Crear Factura</button>
+      </div>
+    </form>
+  </div>
+
   <section id="catalogo" class="catalogo">
     <div class="container">
       <h1>CATÁLOGO</h1>
@@ -426,11 +481,59 @@
             <button class="btn admin-tab" data-tab="refaccion">Refacciones</button>
             <button class="btn admin-tab" data-tab="cita">Citas</button>
             <button class="btn admin-tab" data-tab="personalizacion">Personalizaciones</button>
+            <button class="btn admin-tab" data-tab="inventario">Inventario</button>
+            <button class="btn admin-tab" data-tab="facturacion">Facturación</button>
           </div>
           <div id="admin-content">
             <div id="admin-refaccion" class="admin-table-container" style="display:none"></div>
             <div id="admin-cita" class="admin-table-container" style="display:none"></div>
             <div id="admin-personalizacion" class="admin-table-container" style="display:none"></div>
+            <div id="inventario-panel" class="admin-panel" style="display:none">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                <h3>Inventario</h3>
+                <div>
+                  <button id="refresh-inventario" class="admin-action-btn">Refrescar</button>
+                </div>
+              </div>
+              <div class="admin-quick-actions">
+                <button id="btn-nuevo-material" class="admin-action-btn">+ Nuevo Material</button>
+                <input type="text" id="buscar-inventario" placeholder="Buscar en inventario..." class="admin-search">
+              </div>
+              <div class="admin-table-container">
+                <table class="admin-table">
+                  <thead>
+                    <tr><th>Nombre</th><th>Categoría</th><th>Cantidad</th><th>Precio</th><th>Acciones</th></tr>
+                  </thead>
+                  <tbody id="inventario-table-body"></tbody>
+                </table>
+              </div>
+            </div>
+            <div id="facturacion-panel" class="admin-panel" style="display:none">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                <h3>Facturación</h3>
+                <div>
+                  <button id="refresh-facturas" class="admin-action-btn">Refrescar</button>
+                </div>
+              </div>
+              <div class="admin-quick-actions">
+                <button id="btn-nueva-factura" class="admin-action-btn">+ Nueva Factura</button>
+                <input type="date" id="fecha-factura" class="admin-date">
+                <select id="filtro-estado" class="admin-select">
+                  <option value="">Todos</option>
+                  <option value="pendiente">Pendiente</option>
+                  <option value="pagada">Pagada</option>
+                  <option value="cancelada">Cancelada</option>
+                </select>
+              </div>
+              <div class="admin-table-container">
+                <table class="admin-table">
+                  <thead>
+                    <tr><th>#</th><th>Cliente</th><th>Fecha</th><th>Total</th><th>Estado</th><th>Acciones</th></tr>
+                  </thead>
+                  <tbody id="factura-table-body"></tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
       </div>
