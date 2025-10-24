@@ -463,63 +463,71 @@
             </div>
           </div>
 
-          <form id="inventario-form" class="admin-form">
-            <div class="form-grid">
-              <div class="form-group">
-                <label for="inv_nombre">Nombre del Material/Producto *</label>
-                <input type="text" id="inv_nombre" required>
-              </div>
+          <!-- Panel de control rápido -->
+          <div class="admin-quick-actions">
+            <button id="btn-nuevo-material" class="admin-action-btn">+ Nuevo Material</button>
+            <button id="btn-bajos-stock" class="admin-action-btn">Ver Bajos en Stock</button>
+            <input type="text" id="buscar-inventario" placeholder="Buscar en inventario..." class="admin-search">
+          </div>
+
+          <!-- Formulario de inventario (inicialmente oculto) -->
+          <div id="form-overlay" class="form-overlay" style="display:none;">
+            <form id="inventario-form" class="admin-form" style="background: white; padding: 2em; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); max-width: 600px; margin: 2em auto;">
+              <h3 style="margin-top:0;">Nuevo Material</h3>
               
-              <div class="form-group">
-                <label for="inv_categoria">Categoría *</label>
-                <select id="inv_categoria" required>
-                  <option value="">Seleccionar categoría</option>
-                  <option value="madera">Madera</option>
-                  <option value="tela">Tela</option>
-                  <option value="espuma">Espuma</option>
-                  <option value="herrajes">Herrajes</option>
-                  <option value="pintura">Pintura</option>
-                  <option value="producto_terminado">Producto Terminado</option>
-                </select>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="inv_nombre">Nombre *</label>
+                  <input type="text" id="inv_nombre" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="inv_categoria">Categoría *</label>
+                  <select id="inv_categoria" required>
+                    <option value="">Seleccionar</option>
+                    <option value="madera">Madera</option>
+                    <option value="tela">Tela</option>
+                    <option value="espuma">Espuma</option>
+                    <option value="herrajes">Herrajes</option>
+                    <option value="pintura">Pintura</option>
+                    <option value="producto">Producto Final</option>
+                  </select>
+                </div>
               </div>
 
-              <div class="form-group">
-                <label for="inv_cantidad">Cantidad en Stock *</label>
-                <input type="number" id="inv_cantidad" min="0" required>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="inv_cantidad">Cantidad *</label>
+                  <input type="number" id="inv_cantidad" min="0" required>
+                </div>
+
+                <div class="form-group">
+                  <label for="inv_precio">Precio (COP) *</label>
+                  <input type="number" id="inv_precio" min="0" step="1000" required>
+                </div>
+
+                <div class="form-group">
+                  <label for="inv_punto_reorden">Punto Reorden</label>
+                  <input type="number" id="inv_punto_reorden" min="0" value="5">
+                </div>
               </div>
 
-              <div class="form-group">
-                <label for="inv_punto_reorden">Punto de Reorden</label>
-                <input type="number" id="inv_punto_reorden" min="0">
-                <small>Cantidad mínima antes de reabastecer</small>
+              <div class="form-row">
+                <div class="form-group" style="grid-column: 1/-1;">
+                  <label for="inv_descripcion">Descripción</label>
+                  <textarea id="inv_descripcion" rows="2"></textarea>
+                </div>
               </div>
 
-              <div class="form-group">
-                <label for="inv_precio">Precio Unitario *</label>
-                <input type="number" id="inv_precio" step="1000" min="0" required>
+              <div class="form-actions" style="margin-top:1em;">
+                <button type="button" class="admin-action-btn" style="background:#666;" onclick="document.getElementById('form-overlay').style.display='none'">Cancelar</button>
+                <button type="submit" class="admin-action-btn">Guardar Material</button>
               </div>
+            </form>
+          </div>
 
-              <div class="form-group">
-                <label for="inv_descripcion">Descripción</label>
-                <textarea id="inv_descripcion" rows="2"></textarea>
-              </div>
-
-              <div class="form-group">
-                <label for="inv_ubicacion">Ubicación en Bodega</label>
-                <input type="text" id="inv_ubicacion" placeholder="Ej: Estante A-12">
-              </div>
-
-              <div class="form-group">
-                <label for="inv_proveedor">Proveedor</label>
-                <input type="text" id="inv_proveedor">
-              </div>
-            </div>
-
-            <div class="form-actions">
-              <button type="submit" class="admin-action-btn">Agregar al Inventario</button>
-              <button type="reset" class="admin-action-btn" style="background:#666">Limpiar</button>
-            </div>
-          </form>
+          <!-- Tabla de inventario -->
+          <div class="table-container" style="margin-top:1em;">
 
           <table class="admin-table" id="inventory-table">
             <thead>
@@ -530,64 +538,103 @@
         </div>
 
         <div id="facturacion-panel" class="admin-panel" style="display:none;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-            <h3>Facturación</h3>
-            <div>
-              <button id="refresh-facturas" class="admin-action-btn">Refrescar</button>
+          <!-- Panel de control de facturas -->
+          <div class="admin-quick-actions">
+            <button id="btn-nueva-factura" class="admin-action-btn">+ Nueva Factura</button>
+            <div class="date-filters">
+              <input type="date" id="fecha-desde" class="admin-date">
+              <input type="date" id="fecha-hasta" class="admin-date">
+              <button id="btn-filtrar-fechas" class="admin-action-btn">Filtrar</button>
             </div>
+            <select id="filtro-estado" class="admin-select">
+              <option value="">Todos los estados</option>
+              <option value="pendiente">Pendiente</option>
+              <option value="pagada">Pagada</option>
+              <option value="cancelada">Cancelada</option>
+            </select>
           </div>
 
-          <form id="factura-form" class="admin-form">
-            <div class="form-grid">
-              <div class="form-group">
-                <label for="fac_cliente">Cliente *</label>
-                <input type="text" id="fac_cliente" required>
-              </div>
+          <!-- Formulario de factura (inicialmente oculto) -->
+          <div id="factura-form-overlay" class="form-overlay" style="display:none;">
+            <form id="factura-form" class="admin-form" style="background: white; padding: 2em; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); max-width: 800px; margin: 2em auto;">
+              <h3 style="margin-top:0;">Nueva Factura</h3>
               
-              <div class="form-group">
-                <label for="fac_telefono">Teléfono</label>
-                <input type="tel" id="fac_telefono">
+              <!-- Datos del cliente -->
+              <div class="form-section">
+                <h4>Datos del Cliente</h4>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="fac_cliente">Nombre *</label>
+                    <input type="text" id="fac_cliente" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="fac_documento">Documento</label>
+                    <input type="text" id="fac_documento">
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="fac_telefono">Teléfono</label>
+                    <input type="tel" id="fac_telefono">
+                  </div>
+                  <div class="form-group">
+                    <label for="fac_email">Email</label>
+                    <input type="email" id="fac_email">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="fac_direccion">Dirección</label>
+                  <input type="text" id="fac_direccion">
+                </div>
               </div>
 
-              <div class="form-group">
-                <label for="fac_email">Email</label>
-                <input type="email" id="fac_email">
+              <!-- Items de la factura -->
+              <div class="form-section">
+                <h4>Items</h4>
+                <div id="items-container">
+                  <!-- Items se añaden dinámicamente -->
+                </div>
+                <button type="button" id="add-item-btn" class="admin-action-btn" style="margin-top:1em;">+ Agregar Item</button>
               </div>
 
-              <div class="form-group" style="grid-column: 1/-1;">
-                <label for="fac_direccion">Dirección de Entrega</label>
-                <input type="text" id="fac_direccion">
+              <!-- Resumen y totales -->
+              <div class="factura-summary">
+                <div class="summary-row">
+                  <span>Subtotal:</span>
+                  <span id="factura-subtotal">$0</span>
+                </div>
+                <div class="summary-row">
+                  <span>IVA (19%):</span>
+                  <span id="factura-iva">$0</span>
+                </div>
+                <div class="summary-row total">
+                  <span>Total:</span>
+                  <span id="factura-total">$0</span>
+                </div>
               </div>
+
+              <div class="form-actions" style="margin-top:1em;">
+                <button type="button" class="admin-action-btn" style="background:#666;" onclick="document.getElementById('factura-form-overlay').style.display='none'">Cancelar</button>
+                <button type="submit" class="admin-action-btn">Generar Factura</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Template para items de factura -->
+          <template id="item-row-template">
+            <div class="factura-item-row">
+              <select class="item-producto admin-select" required>
+                <option value="">Seleccionar producto</option>
+              </select>
+              <input type="number" class="item-cantidad admin-input" min="1" value="1" required>
+              <input type="number" class="item-precio admin-input" readonly>
+              <span class="item-total">$0</span>
+              <button type="button" class="remove-item-btn">×</button>
             </div>
+          </template>
 
-            <div class="items-section">
-              <h4>Items de la Factura</h4>
-              <div id="items-container">
-                <!-- Items se agregarán aquí dinámicamente -->
-              </div>
-              <button type="button" id="add-item-btn" class="admin-action-btn">+ Agregar Item</button>
-            </div>
-
-            <div class="factura-summary">
-              <div class="summary-item">
-                <span>Subtotal:</span>
-                <span id="factura-subtotal">$0</span>
-              </div>
-              <div class="summary-item">
-                <span>IVA (19%):</span>
-                <span id="factura-iva">$0</span>
-              </div>
-              <div class="summary-item total">
-                <span>Total:</span>
-                <span id="factura-total">$0</span>
-              </div>
-            </div>
-
-            <div class="form-actions">
-              <button type="submit" class="admin-action-btn">Generar Factura</button>
-              <button type="reset" class="admin-action-btn" style="background:#666">Limpiar</button>
-            </div>
-          </form>
+          <!-- Tabla de facturas -->
+          <div class="table-container" style="margin-top:1em;">
 
           <!-- Template para nuevos items de factura -->
           <template id="item-template">
@@ -616,19 +663,19 @@
 
   <section id="auth" class="auth-section">
       <div class="container">
-        <h2>Iniciar Sesión</h2>
+        <h2>Panel de Administración</h2>
         <div class="auth-form-container">
-          <form id="login-form" class="auth-form">
+          <form id="login-form" class="auth-form" style="max-width: 400px; margin: 0 auto;">
             <div class="form-group">
-              <label for="login_email">Email *</label>
-              <input type="email" id="login_email" required>
+              <label for="usuario">Usuario</label>
+              <input type="text" id="usuario" name="usuario" value="admin@ortizmuebles.com" required>
             </div>
             <div class="form-group">
-              <label for="login_password">Contraseña *</label>
-              <input type="password" id="login_password" required>
+              <label for="password">Contraseña</label>
+              <input type="password" id="password" name="password" value="admin2025" required>
             </div>
-            <div class="form-actions">
-              <button type="submit" class="admin-action-btn">Iniciar Sesión</button>
+            <div class="form-actions" style="text-align: center;">
+              <button type="submit" class="admin-action-btn" style="width: 100%; margin: 1em 0;">Iniciar Sesión</button>
             </div>
           </form>
         </div>
