@@ -49,16 +49,58 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // 2. SOLICITUD DE REFACCIÓN - PERMITE INVITADOS
     if (refaccionForm) {
-        refaccionForm.addEventListener('submit', function(event) {
-            event.preventDefault(); // Detiene el envío de formulario HTML por defecto
+        // Setup image preview
+        const imageInput = document.getElementById('ref_imagen');
+        const imagePreview = document.getElementById('ref-image-preview');
+        
+        if (imageInput) {
+            imageInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        imagePreview.innerHTML = `<img src="${e.target.result}" alt="Vista previa">`;
+                        imagePreview.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
 
-            // ✅ ACEPTA INVITADOS: Se eliminó la validación de login.
+        refaccionForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
             
-            alert('¡Solicitud de Refacción Enviada! Gracias. Nos contactaremos vía correo o WhatsApp para solicitar fotos del mueble y enviarte la cotización detallada. (Lógica de Backend)');
-            // *** PUNTO DE CONEXIÓN AL BACKEND (Cloud Function) ***
-            // Aquí se debe implementar la llamada fetch a: POST /api/solicitar-refaccion
+            const formData = new FormData();
+            formData.append('nombre', document.getElementById('ref_nombre').value);
+            formData.append('correo', document.getElementById('ref_correo').value);
+            formData.append('telefono', document.getElementById('ref_telefono').value);
+            formData.append('detalles', document.getElementById('ref_detalles').value);
+            
+            const imageFile = document.getElementById('ref_imagen').files[0];
+            if (imageFile) {
+                formData.append('imagen', imageFile);
+            }
 
-            refaccionForm.reset();
+            try {
+                // Send as multipart/form-data to the correct endpoint
+                const response = await fetch(`${API_BASE}/refaccion`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    alert('¡Solicitud de Refacción Enviada! Gracias. Revisaremos la imagen y nos contactaremos para darte una cotización detallada.');
+                    refaccionForm.reset();
+                    imagePreview.style.display = 'none';
+                    imagePreview.innerHTML = '';
+                } else {
+                    const text = await response.text();
+                    throw new Error('Error al enviar la solicitud: ' + text);
+                }
+            } catch (error) {
+                alert('Error al enviar la solicitud. Por favor intenta nuevamente.');
+                console.error('Error:', error);
+            }
         });
     }
 

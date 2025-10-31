@@ -6,7 +6,57 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeAdminUI();
     setupEventListeners();
     checkAuthStatus();
+    setupColorPicker();
 });
+
+// Setup color picker functionality
+function setupColorPicker() {
+    const colorPicker = document.getElementById('cat_color_picker');
+    const colorInput = document.getElementById('cat_color_diseno');
+    const colorPreview = document.querySelector('.color-preview');
+
+    if (colorPicker && colorInput && colorPreview) {
+        // Initialize color preview
+        colorPreview.style.backgroundColor = colorPicker.value;
+        
+        // Update color when picker changes
+        colorPicker.addEventListener('input', (e) => {
+            const color = e.target.value;
+            colorPreview.style.backgroundColor = color;
+            const colorName = getColorName(color);
+            if (colorInput.value === '' || colorInput.value.startsWith('#')) {
+                colorInput.value = colorName;
+            }
+        });
+
+        // Update color when input changes
+        colorInput.addEventListener('input', (e) => {
+            const text = e.target.value;
+            if (text.startsWith('#')) {
+                colorPicker.value = text;
+                colorPreview.style.backgroundColor = text;
+            }
+        });
+    }
+}
+
+// Helper function to get color name from hex
+function getColorName(hex) {
+    // Basic color mapping - can be expanded
+    const colorMap = {
+        '#ff0000': 'Rojo',
+        '#00ff00': 'Verde',
+        '#0000ff': 'Azul',
+        '#ffff00': 'Amarillo',
+        '#ff00ff': 'Magenta',
+        '#00ffff': 'Cian',
+        '#ffffff': 'Blanco',
+        '#000000': 'Negro'
+    };
+    
+    // Find closest color or return hex
+    return colorMap[hex.toLowerCase()] || hex;
+}
 
 // Inicialización de UI
 function initializeAdminUI() {
@@ -66,6 +116,73 @@ function refreshPanelData(tabName) {
         case 'pedidos':
             fetchPedidos();
             break;
+        case 'refacciones':
+            fetchRefacciones();
+            break;
+    }
+}
+
+// Cargar solicitudes de refacción
+async function fetchRefacciones() {
+    try {
+        const response = await fetch(`${API_BASE}/refaccion`);
+        const refacciones = await response.json();
+        
+        const tbody = document.querySelector('#refacciones-panel table tbody');
+        if (tbody) {
+            tbody.innerHTML = refacciones.map(ref => `
+                <tr>
+                    <td>${ref.nombre}</td>
+                    <td>${ref.correo}</td>
+                    <td>${ref.telefono}</td>
+                    <td>${ref.detalles}</td>
+                    <td>
+                        ${ref.imagen ? 
+                            `<img src="${ref.imagen}" alt="Imagen del mueble" class="refaccion-preview-img" onclick="showFullImage('${ref.imagen}')">` : 
+                            'Sin imagen'}
+                    </td>
+                    <td>
+                        <button class="admin-action-btn ${ref.estado}" onclick="cambiarEstadoRefaccion('${ref._id}', '${ref.estado}')">
+                            ${getRefaccionButtonText(ref.estado)}
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+    } catch (error) {
+        console.error('Error al cargar refacciones:', error);
+    }
+}
+
+// Mostrar imagen completa
+function showFullImage(imageUrl) {
+    const overlay = document.createElement('div');
+    overlay.className = 'image-overlay';
+    overlay.innerHTML = `
+        <div class="image-overlay-content">
+            <img src="${imageUrl}" alt="Imagen completa">
+            <button onclick="this.parentElement.parentElement.remove()">Cerrar</button>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+}
+
+// Cambiar estado de una refacción (pendiente -> en_proceso -> completada)
+async function cambiarEstadoRefaccion(id, estadoActual) {
+    const nuevoEstado = estadoActual === 'pendiente' ? 'en_proceso' :
+                        estadoActual === 'en_proceso' ? 'completada' : 'pendiente';
+    try {
+        const response = await fetch(`${API_BASE}/refaccion/${id}/estado`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ estado: nuevoEstado })
+        });
+
+        if (response.ok) {
+            fetchRefacciones(); // Recargar la lista
+        }
+    } catch (error) {
+        console.error('Error al actualizar refacción:', error);
     }
 }
 

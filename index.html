@@ -51,6 +51,61 @@
     form input.invalid, form select.invalid, form textarea.invalid { border: 2px solid #c00; background: #fff0f0; }
     form button.btn { margin-top: 1em; font-size: 1.1em; padding: 0.7em 2em; background: #4a90e2; color: #fff; border: none; border-radius: 6px; cursor: pointer; transition: background 0.2s; }
     form button.btn:hover { background: #357ab8; }
+    
+    /* Image Upload Styles */
+    .image-upload-container {
+        margin: 10px 0;
+    }
+    
+    .file-input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px dashed #ccc;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    
+    .image-preview {
+        max-width: 300px;
+        margin: 10px 0;
+        display: none;
+    }
+    
+    .image-preview img {
+        width: 100%;
+        height: auto;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+    }
+    
+    /* Color Picker Styles */
+    .color-picker-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .color-picker {
+      width: 50px !important;
+      height: 50px;
+      padding: 0 !important;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .color-picker::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+    .color-picker::-webkit-color-swatch {
+      border: none;
+      border-radius: 4px;
+    }
+    .color-preview {
+      width: 30px;
+      height: 30px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
   </style>
 </head>
 <body>
@@ -195,6 +250,11 @@
                     <input type="text" id="ref_telefono" name="telefono" placeholder="(Ej: 3157847087)" required>
                     <label>Tipo de Mueble a Refaccionar</label>
                     <textarea id="ref_detalles" name="detalles" rows="3" placeholder="Ej: Sofá de 2 cuerpos, 4 sillas de comedor, Poltrona antigua." required></textarea>
+                    <label>Imagen del Mueble (Opcional)</label>
+                    <div class="image-upload-container">
+                        <input type="file" id="ref_imagen" name="imagen" accept="image/*" class="file-input">
+                        <div class="image-preview" id="ref-image-preview"></div>
+                    </div>
                     <div class="form-message" id="refaccion-form-message"></div>
                     <button type="submit" class="btn">Enviar Solicitud de Refacción</button>
                 </form>
@@ -332,7 +392,11 @@
           </div>
           <div class="form-group">
             <label for="cat_color_diseno">Diseño Decorativo / Color de Tela</label>
-            <input type="text" id="cat_color_diseno" name="cat_color_diseno" required aria-required="true" aria-label="Diseño Decorativo o Color de Tela" placeholder="Ej: Color Rojo o Patrón Geométrico">
+            <div class="color-picker-container">
+              <input type="color" id="cat_color_picker" name="cat_color_picker" class="color-picker" value="#000000">
+              <input type="text" id="cat_color_diseno" name="cat_color_diseno" required aria-required="true" aria-label="Diseño Decorativo o Color de Tela" placeholder="Ej: Patrón Geométrico">
+              <div class="color-preview"></div>
+            </div>
             <div class="error-message" id="error-cat-color-diseno"></div>
           </div>
           <div class="form-group">
